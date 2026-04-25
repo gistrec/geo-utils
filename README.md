@@ -1,8 +1,8 @@
 # Geometry Library
 
 <p align="left">
-    <a href="https://circleci.com/gh/gistrec/cpp-geometry-library/tree/master">
-        <img src="https://img.shields.io/circleci/build/github/gistrec/cpp-geometry-library/master" alt="Build status">
+    <a href="https://github.com/gistrec/cpp-geometry-library/actions/workflows/ci.yml">
+        <img src="https://github.com/gistrec/cpp-geometry-library/actions/workflows/ci.yml/badge.svg" alt="CI">
     </a>
     <a href="#">
       <img src="https://img.shields.io/codacy/grade/bcff544711544d5fb7da95b68abf566d" alt="Code quality">
