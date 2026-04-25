@@ -1,4 +1,6 @@
 /** Including all tests */
+#include "MathUtil/mod.hpp"
+
 #include "SphericalUtil/interpolate.hpp"
 #include "SphericalUtil/computeAngleBetween.hpp"
 #include "SphericalUtil/computeSignedArea.hpp"

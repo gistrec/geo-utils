@@ -4,7 +4,8 @@ sample :
 	-o Sample
 
 gtests :
-	g++ tests/Tests.cpp    \
-	-std=c++14 -Iinclude/  \
-	-lgtest -pthread       \
+	g++ tests/Tests.cpp                        \
+	-std=c++17 -Iinclude/                      \
+	$(shell pkg-config --cflags --libs gtest)  \
+	-pthread                                   \
 	-o GTests

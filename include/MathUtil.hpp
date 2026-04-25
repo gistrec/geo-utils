@@ -59,7 +59,7 @@ public:
      * @param m The modulus.
      */
     static inline double mod(double x, double m) {
-        return remainder(remainder(x, m) + m, m);
+        return fmod(fmod(x, m) + m, m);
     }
 
     /**
