@@ -109,7 +109,7 @@ public:
         // TODO: No solution which would make sense in LatLng-space.
         // if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) return null;
 
-        double fromLngRadians = rad2deg(to.lng) - atan2(n3, n1 * cos(fromLatRadians) - n2 * sin(fromLatRadians));
+        double fromLngRadians = deg2rad(to.lng) - atan2(n3, n1 * cos(fromLatRadians) - n2 * sin(fromLatRadians));
         return LatLng(rad2deg(fromLatRadians), rad2deg(fromLngRadians));
     }
 
