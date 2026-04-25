@@ -101,9 +101,6 @@ TEST(PolyUtil, isLocationOnEdge) {
         EXPECT_FALSE(PolyUtil::isLocationOnEdge(point, closeToNorthPole, true));
     }
 
-    for (const auto & point : { LatLng(80 - small, 0), LatLng(80 + small, 0), LatLng(80, 90) }) {
-        // EXPECT_TRUE(PolyUtil::isLocationOnEdge(point, closeToNorthPole, false));
-    }
     for (const auto & point : { LatLng(79, big), LatLng(90 - small, -90), LatLng(90, -135) }) {
         EXPECT_FALSE(PolyUtil::isLocationOnEdge(point, closeToNorthPole, false));
     }

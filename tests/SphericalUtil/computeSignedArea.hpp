@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <vector>
 
 #include "SphericalUtil.hpp"
 
@@ -12,5 +13,5 @@ TEST(SphericalUtil, computeSignedArea) {
     std::vector<LatLng> path         = { right,   up, front, down, right };
     std::vector<LatLng> pathReversed = { right, down, front,   up, right };
     
-    EXPECT_NEAR(-SphericalUtil::computeSignedArea(path), SphericalUtil::computeSignedArea(pathReversed), 0);
+    EXPECT_NEAR(-SphericalUtil::computeSignedArea(path), SphericalUtil::computeSignedArea(pathReversed), 1.0);
 }

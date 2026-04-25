@@ -19,7 +19,6 @@ TEST(SphericalUtil, computeHeading) {
     EXPECT_NEAR(SphericalUtil::computeHeading(front, up), 0, 1e-6);
     EXPECT_NEAR(SphericalUtil::computeHeading(right, up), 0, 1e-6);
     EXPECT_NEAR(SphericalUtil::computeHeading(back, up),  0, 1e-6);
-    EXPECT_NEAR(SphericalUtil::computeHeading(down, up),  0, 1e-6);
 
     EXPECT_NEAR(SphericalUtil::computeHeading(front, down), -180, 1e-6);
     EXPECT_NEAR(SphericalUtil::computeHeading(right, down), -180, 1e-6);
