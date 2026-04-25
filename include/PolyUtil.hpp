@@ -231,7 +231,7 @@ private:
      * (lat1, lng1) to (lat2, lng2).
      * Longitudes are offset by -lng1; the implicit lng1 becomes 0.
      */
-    static inline double intersects(double lat1, double lat2, double lng2, double lat3, double lng3, bool geodesic) {
+    static inline bool intersects(double lat1, double lat2, double lng2, double lat3, double lng3, bool geodesic) {
         // Both ends on the same side of lng3.
         if ((lng3 >= 0 && lng3 >= lng2) || (lng3 < 0 && lng3 < lng2)) {
             return false;

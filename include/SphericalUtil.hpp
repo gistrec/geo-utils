@@ -195,7 +195,7 @@ public:
      */
     template <typename LatLngList>
     inline static double computeArea(const LatLngList& path) {
-        return abs(SphericalUtil::computeSignedArea(path));
+        return std::abs(SphericalUtil::computeSignedArea(path));
     }
 
     /**
