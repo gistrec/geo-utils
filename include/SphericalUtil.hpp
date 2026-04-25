@@ -103,7 +103,7 @@ public:
         if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) {
             b = n2 * n4 - sqrt(discriminant);
             b /= n1 * n1 + n2 * n2;
-            fromLatRadians = atan2(a, b);
+            fromLatRadians = atan2((n4 - n2 * b) / n1, b);
         }
 
         // TODO: No solution which would make sense in LatLng-space.
