@@ -105,3 +105,17 @@ TEST(PolyUtil, isLocationOnPath) {
         EXPECT_FALSE(PolyUtil::isLocationOnPath(point, closeToNorthPole, false));
     }
 }
+
+TEST(PolyUtil, isLocationOnPath_geodesic_parameter) {
+    // A constant-latitude segment is a Rhumb line but not a great circle arc.
+    // (60, 15) lies exactly on the Rhumb path between (60,0) and (60,30)
+    // but is ~95 km from the corresponding great circle arc.
+    std::vector<LatLng> segment = { {60.0, 0.0}, {60.0, 30.0} };
+    LatLng midpoint(60.0, 15.0);
+
+    // Rhumb (geodesic=false): point IS on the constant-latitude path
+    EXPECT_TRUE(PolyUtil::isLocationOnPath(midpoint, segment, false));
+
+    // Great circle (geodesic=true): point is ~95 km from the arc
+    EXPECT_FALSE(PolyUtil::isLocationOnPath(midpoint, segment, true));
+}

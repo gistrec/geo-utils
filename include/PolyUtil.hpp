@@ -74,7 +74,7 @@ public:
      * closing segment between the first point and the last point is included.
      */
     template <typename LatLngList>
-    static inline bool isLocationOnEdge(const LatLng& point, const LatLngList& polygon, double tolerance = PolyUtil::DEFAULT_TOLERANCE, bool geodesic = true) {
+    static inline bool isLocationOnEdge(const LatLng& point, const LatLngList& polygon, bool geodesic = true, double tolerance = PolyUtil::DEFAULT_TOLERANCE) {
         return PolyUtil::isLocationOnEdgeOrPath(point, polygon, true, geodesic, tolerance);
     }
 
@@ -86,7 +86,7 @@ public:
      * segment between the first point and the last point is not included.
      */
     template <typename LatLngList>
-    static inline bool isLocationOnPath(const LatLng& point, const LatLngList& polyline, double tolerance = PolyUtil::DEFAULT_TOLERANCE, bool geodesic = true) {
+    static inline bool isLocationOnPath(const LatLng& point, const LatLngList& polyline, bool geodesic = true, double tolerance = PolyUtil::DEFAULT_TOLERANCE) {
         return PolyUtil::isLocationOnEdgeOrPath(point, polyline, false, geodesic, tolerance);
     }
 
