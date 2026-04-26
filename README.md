@@ -4,11 +4,11 @@
     <a href="https://github.com/gistrec/cpp-geometry-library/actions/workflows/ci.yml">
         <img src="https://github.com/gistrec/cpp-geometry-library/actions/workflows/ci.yml/badge.svg" alt="CI">
     </a>
+    <a href="https://app.codacy.com/gh/gistrec/cpp-geometry-library/dashboard">
+      <img src="https://img.shields.io/codacy/grade/bcff544711544d5fb7da95b68abf566d" alt="Code quality">
+    </a>
     <a href="https://codecov.io/gh/gistrec/cpp-geometry-library">
       <img src="https://codecov.io/gh/gistrec/cpp-geometry-library/graph/badge.svg" alt="Coverage">
-    </a>
-    <a href="#">
-      <img src="https://img.shields.io/codacy/grade/bcff544711544d5fb7da95b68abf566d" alt="Code quality">
     </a>
     <a href="https://github.com/gistrec/cpp-geometry-library/releases">
         <img src="https://img.shields.io/github/v/release/gistrec/cpp-geometry-library" alt="Release">
