@@ -244,9 +244,6 @@ private:
         if (lat1 <= -M_PI / 2 || lat2 <= -M_PI / 2 || lat1 >= M_PI / 2 || lat2 >= M_PI / 2) {
             return false;
         }
-        if (lng2 <= -M_PI) {
-            return false;
-        }
         double linearLat = (lat1 * (lng2 - lng3) + lat2 * lng3) / lng2;
         // Northern hemisphere and point under lat-lng line.
         if (lat1 >= 0 && lat2 >= 0 && lat3 < linearLat) {
