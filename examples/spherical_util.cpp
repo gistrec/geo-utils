@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "SphericalUtil.hpp"
+#include <CppGeometryLibrary/SphericalUtil.hpp>
 
 int main() {
     LatLng newYork = { 40.7128, -74.0060 };

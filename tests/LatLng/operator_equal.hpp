@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "LatLng.hpp"
+#include <CppGeometryLibrary/LatLng.hpp>
 
 TEST(LatLng, operator_equal) {
     // Basic equality and inequality

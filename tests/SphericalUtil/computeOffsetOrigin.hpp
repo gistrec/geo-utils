@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "SphericalUtil.hpp"
+#include <CppGeometryLibrary/SphericalUtil.hpp>
 #include "../TestHelpers.hpp"
 
 TEST(SphericalUtil, computeOffsetOrigin) {

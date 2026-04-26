@@ -1,6 +1,6 @@
 #pragma once
 #include <gtest/gtest.h>
-#include "MathUtil.hpp"
+#include <CppGeometryLibrary/MathUtil.hpp>
 
 // Checks that two LatLng values agree within 1e-6. Longitude is weighted by
 // cos(lat) so the assertion degenerates gracefully at poles where longitude is

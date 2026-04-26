@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "SphericalUtil.hpp"
+#include <CppGeometryLibrary/SphericalUtil.hpp>
 
 
 TEST(SphericalUtil, computeSignedArea) {

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "PolyUtil.hpp"
-#include "SphericalUtil.hpp"
+#include <CppGeometryLibrary/PolyUtil.hpp>
+#include <CppGeometryLibrary/SphericalUtil.hpp>
 
 
 TEST(PolyUtil, distanceToLine) {

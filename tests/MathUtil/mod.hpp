@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "MathUtil.hpp"
+#include <CppGeometryLibrary/MathUtil.hpp>
 
 
 TEST(MathUtil, mod_positive) {

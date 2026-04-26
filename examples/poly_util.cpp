@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "PolyUtil.hpp"
+#include <CppGeometryLibrary/PolyUtil.hpp>
 
 int main() {
     // Bounding box around Midtown Manhattan

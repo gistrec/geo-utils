@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "PolyUtil.hpp"
+#include <CppGeometryLibrary/PolyUtil.hpp>
 
 
 TEST(PolyUtil, isLocationOnEdge) {
