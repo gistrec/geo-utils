@@ -90,20 +90,14 @@ public:
     }
 
     /**
-     * Computes whether (and where) a given point lies on or near a polyline, within a specified tolerance.
-     * If closed, the closing segment between the last and first points of the polyline is not considered.
+     * Computes whether a given point lies on or near a polyline, within a specified tolerance.
      *
-     * @param point          our needle
-     * @param poly           our haystack
-     * @param closed         whether the polyline should be considered closed by a segment connecting the last point back to the first one
-     * @param geodesic       the polyline is composed of great circle segments if geodesic
-     *                       is true, and of Rhumb segments otherwise
-     * @param toleranceEarth tolerance (in meters)
-     * @return -1 if point does not lie on or near the polyline.
-     * 0 if point is between poly[0] and poly[1] (inclusive),
-     * 1 if between poly[1] and poly[2],
-     * ...,
-     * poly.size()-2 if between poly[poly.size() - 2] and poly[poly.size() - 1]
+     * @param point          the point to test
+     * @param poly           the polyline (or polygon edge) to test against
+     * @param closed         if true, a closing segment from the last point back to the first is included
+     * @param geodesic       if true, segments are great circle arcs; otherwise Rhumb lines
+     * @param toleranceEarth tolerance in meters
+     * @return true if the point lies on or within toleranceEarth of any segment
      */
     template <typename LatLngList>
     static inline bool isLocationOnEdgeOrPath(const LatLng& point, const LatLngList& poly, bool closed, bool geodesic, double toleranceEarth) {
