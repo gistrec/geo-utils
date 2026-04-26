@@ -25,6 +25,26 @@ C++ Geometry Library provides utility functions for the computation of geometric
 * [Spherical](https://developers.google.com/maps/documentation/javascript/reference#spherical) contains spherical geometry utilities allowing you to compute angles, distances and areas from latitudes and longitudes.
 * [Poly](https://developers.google.com/maps/documentation/javascript/reference#poly) utility functions for computations involving polygons and polylines.
 
+## Installation
+
+### CMake (recommended)
+
+```cmake
+find_package(CppGeometryLibrary REQUIRED)
+target_link_libraries(your_target PRIVATE CppGeometryLibrary::CppGeometryLibrary)
+```
+
+Or embed directly with `add_subdirectory`:
+
+```cmake
+add_subdirectory(cpp-geometry-library)
+target_link_libraries(your_target PRIVATE CppGeometryLibrary::CppGeometryLibrary)
+```
+
+### Manual
+
+Copy the `include/` directory into your project and add it to your include path.
+
 ## Usage
 
 You just need to include `SphericalUtil.hpp` or `PolyUtil.hpp`
