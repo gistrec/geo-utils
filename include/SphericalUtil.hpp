@@ -89,26 +89,21 @@ public:
         double n2 = sin(distance) * cos(heading);
         double n3 = sin(distance) * sin(heading);
         double n4 = sin(deg2rad(to.lat));
-        // There are two solutions for b. b = n2 * n4 +/- sqrt(), one solution results
-        // in the latitude outside the [-90, 90] range. We first try one solution and
-        // back off to the other if we are outside that range.
-        double n12 = n1 * n1;
-        double discriminant = n2 * n2 * n12 + n12 * n12 - n12 * n4 * n4;
-
-        if (discriminant < 0) return std::nullopt;
-
-        double b = n2 * n4 + sqrt(discriminant);
-        b /= n1 * n1 + n2 * n2;
-        double a = (n4 - n2 * b) / n1;
-        double fromLatRadians = atan2(a, b);
+        // Rewrite n4 = n1*sin(φ) + n2*cos(φ) as r*sin(φ + α) = n4,
+        // where r = sqrt(n1²+n2²), α = atan2(n2, n1).
+        // Solving via asin avoids dividing by n1, which causes catastrophic
+        // cancellation in the original a/b formulation when n1 ≈ 0
+        // (i.e. distance ≈ π/2·R).
+        double r = sqrt(n1 * n1 + n2 * n2);
+        if (r < 1e-10) return std::nullopt;
+        double sinArg = n4 / r;
+        if (sinArg < -1.0 || sinArg > 1.0) return std::nullopt;
+        double alpha = atan2(n2, n1);
+        double fromLatRadians = asin(sinArg) - alpha;
         if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) {
-            b = n2 * n4 - sqrt(discriminant);
-            b /= n1 * n1 + n2 * n2;
-            fromLatRadians = atan2((n4 - n2 * b) / n1, b);
+            fromLatRadians = M_PI - asin(sinArg) - alpha;
         }
-
         if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) return std::nullopt;
-
         double fromLngRadians = deg2rad(to.lng) - atan2(n3, n1 * cos(fromLatRadians) - n2 * sin(fromLatRadians));
         return LatLng(rad2deg(fromLatRadians), rad2deg(fromLngRadians));
     }

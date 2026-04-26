@@ -57,4 +57,18 @@ TEST(SphericalUtil, computeOffsetOrigin) {
         EXPECT_NEAR(r->lat,   0.0, 1e-6);
         EXPECT_NEAR(r->lng, -30.0, 1e-6);
     }
+
+    // Round-trip at distance = π/2·R (quarter sphere).
+    // At this distance n1 = cos(π/2) ≈ 0, causing catastrophic cancellation in
+    // the original a = (n4 - n2·b)/n1 formula: the deg/rad round-trip in to.lat
+    // leaves n4 - n2·b ≈ 1 ULP, which gets amplified by 1/n1 ≈ 1.6e16.
+    // Two valid origins exist at this distance; verify the returned one actually
+    // maps back to 'to' rather than containing the garbage cancellation produces.
+    {
+        const double half_pi_R = M_PI / 2 * MathUtil::EARTH_RADIUS;
+        LatLng to = SphericalUtil::computeOffset(LatLng(30.0, 20.0), half_pi_R, 45.0);
+        auto r = SphericalUtil::computeOffsetOrigin(to, half_pi_R, 45.0);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR_LatLng(to, SphericalUtil::computeOffset(r.value(), half_pi_R, 45.0));
+    }
 }
