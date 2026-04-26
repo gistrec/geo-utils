@@ -36,6 +36,12 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             PRIVATE CppGeometryLibrary GTest::GTest GTest::Main
         )
         add_test(NAME cpp_geometry_tests COMMAND cpp_geometry_tests)
+
+        option(ENABLE_COVERAGE "Enable gcov coverage instrumentation (GCC/Clang only)" OFF)
+        if(ENABLE_COVERAGE)
+            target_compile_options(cpp_geometry_tests PRIVATE --coverage)
+            target_link_options(cpp_geometry_tests PRIVATE --coverage)
+        endif()
     endif()
 
     add_executable(cpp_geometry_sample samples/samples.cpp)
