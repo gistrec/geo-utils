@@ -21,7 +21,7 @@ jobs:
         run: make gtests
 
       - name: Run tests
-        run: ./GTests --gtest_filter=*
+        run: ./gtests --gtest_filter=*
 
   samples:
     runs-on: ubuntu-latest
@@ -32,4 +32,4 @@ jobs:
         run: make sample
 
       - name: Run sample
-        run: ./Sample
+        run: ./sample
