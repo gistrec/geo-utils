@@ -136,7 +136,9 @@ public:
         double angle = SphericalUtil::computeAngleBetween(from, to);
         double sinAngle = sin(angle);
         if (sinAngle < 1e-6) {
-            return from;
+            return LatLng(
+                from.lat + fraction * (to.lat - from.lat),
+                from.lng + fraction * (to.lng - from.lng));
         }
         double a = sin((1 - fraction) * angle) / sinAngle;
         double b = sin(fraction * angle) / sinAngle;

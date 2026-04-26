@@ -44,9 +44,16 @@ TEST(SphericalUtil, interpolate) {
 
     // two nearby points, separated by ~4m, for which the Slerp algorithm is not stable and we
     // have to fall back to linear interpolation.
-    LatLng interpolateResult = SphericalUtil::interpolate(LatLng(-37.756891, 175.325262), LatLng(-37.756853, 175.325242), 0.5);
-    LatLng goldenResult(-37.756872, 175.325252);
+    LatLng nearA(-37.756891, 175.325262);
+    LatLng nearB(-37.756853, 175.325242);
 
-    EXPECT_NEAR(interpolateResult.lat, goldenResult.lat, 2e-5);
-    EXPECT_NEAR(interpolateResult.lng, goldenResult.lng, 2e-5);
+    LatLng interpolateResult = SphericalUtil::interpolate(nearA, nearB, 0.5);
+    LatLng goldenResult(-37.756872, 175.325252);
+    EXPECT_NEAR(interpolateResult.lat, goldenResult.lat, 1e-6);
+    EXPECT_NEAR(interpolateResult.lng, goldenResult.lng, 1e-6);
+
+    // fraction=1.0 must return 'to', not 'from'
+    LatLng endResult = SphericalUtil::interpolate(nearA, nearB, 1.0);
+    EXPECT_NEAR(endResult.lat, nearB.lat, 1e-6);
+    EXPECT_NEAR(endResult.lng, nearB.lng, 1e-6);
 }
