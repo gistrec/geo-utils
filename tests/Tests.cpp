@@ -1,4 +1,6 @@
 /** Including all tests */
+#include "LatLng/operator_equal.hpp"
+
 #include "MathUtil/mod.hpp"
 
 #include "SphericalUtil/interpolate.hpp"

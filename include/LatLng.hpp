@@ -35,14 +35,21 @@ public:
     LatLng& operator=(const LatLng & other) = default;
 
     bool operator==(const LatLng & other) const {
-        return isCoordinateEqual(lat, other.lat) && 
-               isCoordinateEqual(lng, other.lng);
+        return isCoordinateEqual(lat, other.lat) &&
+               isLngEqual(lng, other.lng);
     }
 
 
 private:
     bool isCoordinateEqual(double first, double second) const {
         return std::fabs(first - second) < 1e-12;
+    }
+
+    // Longitude wraps: 180° and -180° are the same meridian.
+    bool isLngEqual(double a, double b) const {
+        double diff = std::fabs(std::fmod(a - b, 360.0));
+        if (diff > 180.0) diff = 360.0 - diff;
+        return diff < 1e-12;
     }
 };
 
