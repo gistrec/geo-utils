@@ -90,6 +90,40 @@ public:
     }
 
     /**
+       * Computes the distance on the sphere between the point p and the line segment start to end.
+     *
+     * @param p the point to be measured
+     * @param start the beginning of the line segment
+     * @param end the end of the line segment
+     * @return the distance in meters (assuming spherical earth)
+     */
+    static inline double distanceToLine(const LatLng& p, const LatLng& start, const LatLng& end) {
+        if (start == end) {
+            return SphericalUtil::computeDistanceBetween(end, p);
+        }
+        double s0lat = MathUtil::deg2rad(p.lat);
+        double s0lng = MathUtil::deg2rad(p.lng);
+        double s1lat = MathUtil::deg2rad(start.lat);
+        double s1lng = MathUtil::deg2rad(start.lng);
+        double s2lat = MathUtil::deg2rad(end.lat);
+        double s2lng = MathUtil::deg2rad(end.lng);
+        double s2s1lat = s2lat - s1lat;
+        double s2s1lng = s2lng - s1lng;
+        double u = ((s0lat - s1lat) * s2s1lat + (s0lng - s1lng) * s2s1lng)
+            / (s2s1lat * s2s1lat + s2s1lng * s2s1lng);
+        if (u <= 0) {
+            return SphericalUtil::computeDistanceBetween(p, start);
+        }
+        if (u >= 1) {
+            return SphericalUtil::computeDistanceBetween(p, end);
+        }
+        LatLng su(start.lat + u * (end.lat - start.lat), start.lng + u * (end.lng - start.lng));
+        return SphericalUtil::computeDistanceBetween(p, su);
+    }
+
+
+private:
+    /**
      * Computes whether a given point lies on or near a polyline, within a specified tolerance.
      *
      * @param point          the point to test
@@ -170,40 +204,6 @@ public:
         return false;
     }
 
-    /**
-       * Computes the distance on the sphere between the point p and the line segment start to end.
-     *
-     * @param p the point to be measured
-     * @param start the beginning of the line segment
-     * @param end the end of the line segment
-     * @return the distance in meters (assuming spherical earth)
-     */
-    static inline double distanceToLine(const LatLng& p, const LatLng& start, const LatLng& end) {
-        if (start == end) {
-            return SphericalUtil::computeDistanceBetween(end, p);
-        }
-        double s0lat = MathUtil::deg2rad(p.lat);
-        double s0lng = MathUtil::deg2rad(p.lng);
-        double s1lat = MathUtil::deg2rad(start.lat);
-        double s1lng = MathUtil::deg2rad(start.lng);
-        double s2lat = MathUtil::deg2rad(end.lat);
-        double s2lng = MathUtil::deg2rad(end.lng);
-        double s2s1lat = s2lat - s1lat;
-        double s2s1lng = s2lng - s1lng;
-        double u = ((s0lat - s1lat) * s2s1lat + (s0lng - s1lng) * s2s1lng)
-            / (s2s1lat * s2s1lat + s2s1lng * s2s1lng);
-        if (u <= 0) {
-            return SphericalUtil::computeDistanceBetween(p, start);
-        }
-        if (u >= 1) {
-            return SphericalUtil::computeDistanceBetween(p, end);
-        }
-        LatLng su(start.lat + u * (end.lat - start.lat), start.lng + u * (end.lng - start.lng));
-        return SphericalUtil::computeDistanceBetween(p, su);
-    }
-
-
-private:
     /**
      * Returns tan(latitude-at-lng3) on the great circle (lat1, lng1) to (lat2, lng2). lng1==0.
      * See http://williams.best.vwh.net/avform.htm .
