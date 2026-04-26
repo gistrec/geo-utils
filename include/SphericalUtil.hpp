@@ -1,16 +1,15 @@
-//******************************************************************************
+// Copyright 2026 Aleksandr Kovalko
+// Licensed under the Apache License, Version 2.0
+//
+// Portions of this file are based on Google Maps Android Utils:
+// https://github.com/googlemaps/android-maps-utils
+//
+// Original work:
 // Copyright 2013 Google Inc.
-// https://github.com/googlemaps/android-maps-utils/blob/master/library/src/main/java/com/google/maps/android/SphericalUtil.java
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// This software and the related documents are provided  as is,  with no express
-// or implied  warranties,  other than  those that are  expressly stated  in the
-// License.
-//******************************************************************************
+// This file has been modified from the original work,
+// including a port from Java to C++.
 
 #ifndef GEOMETRY_LIBRARY_SPHERICAL_UTIL
 #define GEOMETRY_LIBRARY_SPHERICAL_UTIL
