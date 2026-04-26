@@ -94,7 +94,7 @@ public:
      * The argument must be in [0, 1], and the result is positive.
      */
     static inline double arcHav(double x) {
-        return 2.0 * asin(sqrt(x));
+        return 2.0 * asin(sqrt(clamp(x, 0.0, 1.0)));
     }
 
     // Given h==hav(x), returns sin(abs(x)).

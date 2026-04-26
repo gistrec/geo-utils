@@ -60,6 +60,13 @@ TEST(MathUtil, hav_arcHav) {
     EXPECT_NEAR(MathUtil::arcHav(MathUtil::hav(1.2)), 1.2, 1e-10);
 }
 
+TEST(MathUtil, arcHav_clamp) {
+    // Floating-point rounding can push the haversine value slightly outside [0,1].
+    // arcHav must clamp rather than pass a bad value to sqrt/asin and return NaN.
+    EXPECT_NEAR(MathUtil::arcHav( 1.0 + 1e-15),  M_PI, 1e-9); // x > 1 → clamp to π
+    EXPECT_NEAR(MathUtil::arcHav(-1e-15),         0.0, 1e-9); // x < 0 → clamp to 0
+}
+
 TEST(MathUtil, sinFromHav) {
     EXPECT_NEAR(MathUtil::sinFromHav(0.0), 0.0, 1e-10); // sin(0) == 0
     EXPECT_NEAR(MathUtil::sinFromHav(0.5), 1.0, 1e-10); // sin(π/2) == 1

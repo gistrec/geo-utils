@@ -66,7 +66,7 @@ public:
             sinDistance * cosFromLat * sin(heading),
             cosDistance - sinFromLat * sinLat);
 
-        return LatLng(rad2deg(asin(sinLat)), rad2deg(fromLng + dLng));
+        return LatLng(rad2deg(asin(MathUtil::clamp(sinLat, -1.0, 1.0))), rad2deg(fromLng + dLng));
     }
 
 
