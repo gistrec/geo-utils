@@ -21,14 +21,6 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-inline double deg2rad(double degrees) {
-    return degrees * M_PI / 180.0;
-}
-
-inline double rad2deg(double angle) {
-    return angle * 180.0 / M_PI;
-}
-
 class MathUtil {
 public:
     /**
@@ -36,6 +28,14 @@ public:
      * Mean radius as defined by IUGG.
      */
     static constexpr double EARTH_RADIUS = 6371009.0;
+
+    static inline double deg2rad(double degrees) {
+        return degrees * M_PI / 180.0;
+    }
+
+    static inline double rad2deg(double angle) {
+        return angle * 180.0 / M_PI;
+    }
 
     /**
      * Restrict x to the range [low, high].

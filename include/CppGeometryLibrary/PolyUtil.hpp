@@ -37,11 +37,11 @@ public:
         if (size == 0) {
             return false;
         }
-        double lat3 = deg2rad(point.lat);
-        double lng3 = deg2rad(point.lng);
+        double lat3 = MathUtil::deg2rad(point.lat);
+        double lng3 = MathUtil::deg2rad(point.lng);
         LatLng prev = polygon[size - 1];
-        double lat1 = deg2rad(prev.lat);
-        double lng1 = deg2rad(prev.lng);
+        double lat1 = MathUtil::deg2rad(prev.lat);
+        double lng1 = MathUtil::deg2rad(prev.lng);
 
         size_t nIntersect = 0;
 
@@ -52,8 +52,8 @@ public:
                 return true;
             }
 
-            double lat2 = deg2rad(val.lat);
-            double lng2 = deg2rad(val.lng);
+            double lat2 = MathUtil::deg2rad(val.lat);
+            double lng2 = MathUtil::deg2rad(val.lng);
 
             // Offset longitudes by -lng1.
             if (PolyUtil::intersects(lat1, lat2, MathUtil::wrap(lng2 - lng1, -M_PI, M_PI), lat3, dLng3, geodesic)) {
@@ -115,16 +115,16 @@ public:
 
         double tolerance = toleranceEarth / MathUtil::EARTH_RADIUS;
         double havTolerance = MathUtil::hav(tolerance);
-        double lat3 = deg2rad(point.lat);
-        double lng3 = deg2rad(point.lng);
+        double lat3 = MathUtil::deg2rad(point.lat);
+        double lng3 = MathUtil::deg2rad(point.lng);
         LatLng prev = poly[closed ? size - 1 : 0];
-        double lat1 = deg2rad(prev.lat);
-        double lng1 = deg2rad(prev.lng);
+        double lat1 = MathUtil::deg2rad(prev.lat);
+        double lng1 = MathUtil::deg2rad(prev.lng);
 
         if (geodesic) {
             for (auto val : poly) {
-                double lat2 = deg2rad(val.lat);
-                double lng2 = deg2rad(val.lng);
+                double lat2 = MathUtil::deg2rad(val.lat);
+                double lng2 = MathUtil::deg2rad(val.lng);
                 if (PolyUtil::isOnSegmentGC(lat1, lng1, lat2, lng2, lat3, lng3, havTolerance)) {
                     return true;
                 }
@@ -143,9 +143,9 @@ public:
             double y3 = MathUtil::mercator(lat3);
             double xTry[3];
             for (auto val : poly) {
-                double lat2 = deg2rad(val.lat);
+                double lat2 = MathUtil::deg2rad(val.lat);
                 double y2 = MathUtil::mercator(lat2);
-                double lng2 = deg2rad(val.lng);
+                double lng2 = MathUtil::deg2rad(val.lng);
                 if (std::max(lat1, lat2) >= minAcceptable && std::min(lat1, lat2) <= maxAcceptable) {
                     // We offset longitudes by -lng1; the implicit x1 is 0.
                     double x2 = MathUtil::wrap(lng2 - lng1, -M_PI, M_PI);
@@ -188,12 +188,12 @@ public:
         if (start == end) {
             return SphericalUtil::computeDistanceBetween(end, p);
         }
-        double s0lat = deg2rad(p.lat);
-        double s0lng = deg2rad(p.lng);
-        double s1lat = deg2rad(start.lat);
-        double s1lng = deg2rad(start.lng);
-        double s2lat = deg2rad(end.lat);
-        double s2lng = deg2rad(end.lng);
+        double s0lat = MathUtil::deg2rad(p.lat);
+        double s0lng = MathUtil::deg2rad(p.lng);
+        double s1lat = MathUtil::deg2rad(start.lat);
+        double s1lng = MathUtil::deg2rad(start.lng);
+        double s2lat = MathUtil::deg2rad(end.lat);
+        double s2lng = MathUtil::deg2rad(end.lng);
         double s2s1lat = s2lat - s1lat;
         double s2s1lng = s2lng - s1lng;
         double u = ((s0lat - s1lat) * s2s1lat + (s0lng - s1lng) * s2s1lng)

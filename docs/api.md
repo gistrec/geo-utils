@@ -313,5 +313,5 @@ Low-level math helpers used internally. Available for direct use if needed.
 | `MathUtil::EARTH_RADIUS` | `double` | Mean Earth radius: `6371009.0` m (IUGG) |
 | `MathUtil::clamp(x, low, high)` | `double` | Clamps `x` to `[low, high]` |
 | `MathUtil::wrap(n, min, max)` | `double` | Wraps `n` into `[min, max)` |
-| `deg2rad(degrees)` | `double` | Converts degrees to radians |
-| `rad2deg(radians)` | `double` | Converts radians to degrees |
+| `MathUtil::deg2rad(degrees)` | `double` | Converts degrees to radians |
+| `MathUtil::rad2deg(radians)` | `double` | Converts radians to degrees |

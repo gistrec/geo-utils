@@ -9,7 +9,7 @@
 #define EXPECT_NEAR_LatLng(expected, actual)                                          \
     do {                                                                              \
         EXPECT_NEAR((expected).lat, (actual).lat, 1e-6);                             \
-        const double _cosLat = cos(deg2rad((expected).lat));                          \
+        const double _cosLat = cos(MathUtil::deg2rad((expected).lat));                          \
         const double _eLng = MathUtil::wrap((expected).lng, -180.0, 180.0);          \
         const double _aLng = MathUtil::wrap((actual).lng,   -180.0, 180.0);          \
         EXPECT_NEAR(_cosLat * _eLng, _cosLat * _aLng, 1e-6);                        \

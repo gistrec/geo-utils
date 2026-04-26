@@ -29,16 +29,16 @@ public:
      */
     inline static double computeHeading(const LatLng& from, const LatLng& to) {
         // http://williams.best.vwh.net/avform.htm#Crs
-        double fromLat = deg2rad(from.lat);
-        double fromLng = deg2rad(from.lng);
-        double toLat = deg2rad(to.lat);
-        double toLng = deg2rad(to.lng);
+        double fromLat = MathUtil::deg2rad(from.lat);
+        double fromLng = MathUtil::deg2rad(from.lng);
+        double toLat = MathUtil::deg2rad(to.lat);
+        double toLng = MathUtil::deg2rad(to.lng);
         double dLng = toLng - fromLng;
         double heading = atan2(
             sin(dLng) * cos(toLat),
             cos(fromLat) * sin(toLat) - sin(fromLat) * cos(toLat) * cos(dLng));
 
-        return MathUtil::wrap(rad2deg(heading), -180, 180);
+        return MathUtil::wrap(MathUtil::rad2deg(heading), -180, 180);
     }
 
 
@@ -52,10 +52,10 @@ public:
      */
     inline static LatLng computeOffset(const LatLng& from, double distance, double heading) {
         distance /= MathUtil::EARTH_RADIUS;
-        heading = deg2rad(heading);
+        heading = MathUtil::deg2rad(heading);
         // http://williams.best.vwh.net/avform.htm#LL
-        double fromLat = deg2rad(from.lat);
-        double fromLng = deg2rad(from.lng);
+        double fromLat = MathUtil::deg2rad(from.lat);
+        double fromLng = MathUtil::deg2rad(from.lng);
         double cosDistance = cos(distance);
         double sinDistance = sin(distance);
         double sinFromLat = sin(fromLat);
@@ -65,7 +65,7 @@ public:
             sinDistance * cosFromLat * sin(heading),
             cosDistance - sinFromLat * sinLat);
 
-        return LatLng(rad2deg(asin(MathUtil::clamp(sinLat, -1.0, 1.0))), rad2deg(fromLng + dLng));
+        return LatLng(MathUtil::rad2deg(asin(MathUtil::clamp(sinLat, -1.0, 1.0))), MathUtil::rad2deg(fromLng + dLng));
     }
 
 
@@ -81,13 +81,13 @@ public:
      * @param heading  The heading in degrees clockwise from north.
      */
     inline static std::optional<LatLng> computeOffsetOrigin(const LatLng& to, double distance, double heading) {
-        heading = deg2rad(heading);
+        heading = MathUtil::deg2rad(heading);
         distance /= MathUtil::EARTH_RADIUS;
         // http://lists.maptools.org/pipermail/proj/2008-October/003939.html
         double n1 = cos(distance);
         double n2 = sin(distance) * cos(heading);
         double n3 = sin(distance) * sin(heading);
-        double n4 = sin(deg2rad(to.lat));
+        double n4 = sin(MathUtil::deg2rad(to.lat));
         // Rewrite n4 = n1*sin(φ) + n2*cos(φ) as r*sin(φ + α) = n4,
         // where r = sqrt(n1²+n2²), α = atan2(n2, n1).
         // Solving via asin avoids dividing by n1, which causes catastrophic
@@ -103,8 +103,8 @@ public:
             fromLatRadians = M_PI - asin(sinArg) - alpha;
         }
         if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) return std::nullopt;
-        double fromLngRadians = deg2rad(to.lng) - atan2(n3, n1 * cos(fromLatRadians) - n2 * sin(fromLatRadians));
-        return LatLng(rad2deg(fromLatRadians), rad2deg(fromLngRadians));
+        double fromLngRadians = MathUtil::deg2rad(to.lng) - atan2(n3, n1 * cos(fromLatRadians) - n2 * sin(fromLatRadians));
+        return LatLng(MathUtil::rad2deg(fromLatRadians), MathUtil::rad2deg(fromLngRadians));
     }
 
 
@@ -120,10 +120,10 @@ public:
      */
     inline static LatLng interpolate(const LatLng& from, const LatLng& to, double fraction) {
         // http://en.wikipedia.org/wiki/Slerp
-        double fromLat = deg2rad(from.lat);
-        double fromLng = deg2rad(from.lng);
-        double toLat = deg2rad(to.lat);
-        double toLng = deg2rad(to.lng);
+        double fromLat = MathUtil::deg2rad(from.lat);
+        double fromLng = MathUtil::deg2rad(from.lng);
+        double toLat = MathUtil::deg2rad(to.lat);
+        double toLng = MathUtil::deg2rad(to.lng);
         double cosFromLat = cos(fromLat);
         double cosToLat = cos(toLat);
         // Computes Spherical interpolation coefficients.
@@ -143,7 +143,7 @@ public:
         // Converts interpolated vector back to polar.
         double lat = atan2(z, sqrt(x * x + y * y));
         double lng = atan2(y, x);
-        return LatLng(rad2deg(lat), rad2deg(lng));
+        return LatLng(MathUtil::rad2deg(lat), MathUtil::rad2deg(lng));
     }
 
     /**
@@ -151,7 +151,7 @@ public:
      * on the unit sphere.
      */
     inline static double computeAngleBetween(const LatLng& from, const LatLng& to) {
-        return SphericalUtil::distanceRadians(deg2rad(from.lat), deg2rad(from.lng), deg2rad(to.lat), deg2rad(to.lng));
+        return SphericalUtil::distanceRadians(MathUtil::deg2rad(from.lat), MathUtil::deg2rad(from.lng), MathUtil::deg2rad(to.lat), MathUtil::deg2rad(to.lng));
     }
 
     /**
@@ -171,11 +171,11 @@ public:
         }
         double length = 0;
         LatLng prev = path[0];
-        double prevLat = deg2rad(prev.lat);
-        double prevLng = deg2rad(prev.lng);
+        double prevLat = MathUtil::deg2rad(prev.lat);
+        double prevLng = MathUtil::deg2rad(prev.lng);
         for (auto point : path) {
-            double lat = deg2rad(point.lat);
-            double lng = deg2rad(point.lng);
+            double lat = MathUtil::deg2rad(point.lat);
+            double lng = MathUtil::deg2rad(point.lng);
             length += SphericalUtil::distanceRadians(prevLat, prevLng, lat, lng);
             prevLat = lat;
             prevLng = lng;
@@ -227,13 +227,13 @@ private:
         if (size < 3U) { return 0; }
         double total = 0;
         LatLng prev = path[size - 1];
-        double prevTanLat = tan((M_PI / 2 - deg2rad(prev.lat)) / 2);
-        double prevLng = deg2rad(prev.lng);
+        double prevTanLat = tan((M_PI / 2 - MathUtil::deg2rad(prev.lat)) / 2);
+        double prevLng = MathUtil::deg2rad(prev.lng);
         // For each edge, accumulate the signed area of the triangle formed by the North Pole
         // and that edge ("polar triangle").
         for (auto point : path) {
-            double tanLat = tan((M_PI / 2 - deg2rad(point.lat)) / 2);
-            double lng = deg2rad(point.lng);
+            double tanLat = tan((M_PI / 2 - MathUtil::deg2rad(point.lat)) / 2);
+            double lng = MathUtil::deg2rad(point.lng);
             total += SphericalUtil::polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
             prevTanLat = tanLat;
             prevLng = lng;

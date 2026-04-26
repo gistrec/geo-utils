@@ -43,8 +43,8 @@ TEST(MathUtil, mercator_inverseMercator) {
     EXPECT_NEAR(MathUtil::inverseMercator(0.0), 0.0, 1e-10);
 
     // Round-trip: inverseMercator(mercator(lat)) == lat
-    EXPECT_NEAR(MathUtil::inverseMercator(MathUtil::mercator(deg2rad( 45.0))), deg2rad( 45.0), 1e-10);
-    EXPECT_NEAR(MathUtil::inverseMercator(MathUtil::mercator(deg2rad(-30.0))), deg2rad(-30.0), 1e-10);
+    EXPECT_NEAR(MathUtil::inverseMercator(MathUtil::mercator(MathUtil::deg2rad( 45.0))), MathUtil::deg2rad( 45.0), 1e-10);
+    EXPECT_NEAR(MathUtil::inverseMercator(MathUtil::mercator(MathUtil::deg2rad(-30.0))), MathUtil::deg2rad(-30.0), 1e-10);
 }
 
 TEST(MathUtil, hav_arcHav) {

@@ -15,7 +15,7 @@ TEST(SphericalUtil, computeLength) {
 
     // List with two points 
     latLngs.push_back(LatLng(0.1, 0.1));
-    EXPECT_NEAR(SphericalUtil::computeLength(latLngs), deg2rad(0.1) * sqrt(2) * MathUtil::EARTH_RADIUS, 1);
+    EXPECT_NEAR(SphericalUtil::computeLength(latLngs), MathUtil::deg2rad(0.1) * sqrt(2) * MathUtil::EARTH_RADIUS, 1);
 
     // List with three points
     std::vector<LatLng> latLngs2 = { {0, 0}, {90, 0}, {0, 90} };
