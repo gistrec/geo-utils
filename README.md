@@ -66,8 +66,8 @@ int main() {
 ### PolyUtil class
 
 * [`containsLocation(LatLng point, LatLngList polygon,  bool geodesic)`](#containsLocation)
-* [`isLocationOnEdge(LatLng point, LatLngList polygon,  double tolerance, bool geodesic)`](#isLocationOnEdge)
-* [`isLocationOnPath(LatLng point, LatLngList polyline, double tolerance, bool geodesic)`](#isLocationOnPath)
+* [`isLocationOnEdge(LatLng point, LatLngList polygon,  bool geodesic, double tolerance)`](#isLocationOnEdge)
+* [`isLocationOnPath(LatLng point, LatLngList polyline, bool geodesic, double tolerance)`](#isLocationOnPath)
 * [`distanceToLine(LatLng point, LatLng start, LatLng end)`](#distanceToLine)
 
 ### SphericalUtil class
@@ -132,12 +132,12 @@ std::cout << PolyUtil::containsLocation(LatLng(-90, 0), aroundNorthPole); // fal
 ---
 
 <a name="isLocationOnEdge"></a>
-**`PolyUtil::isLocationOnEdge(const LatLng& point, const LatLngList& polygon, double tolerance = PolyUtil::DEFAULT_TOLERANCE, bool geodesic = true)`** - Computes whether the given point lies on or near to a polyline, or the edge of a polygon, within a specified tolerance. Returns true when the difference between the latitude and longitude of the supplied point, and the closest point on the edge, is less than the tolerance. The tolerance defaults to `0.1` meters.
+**`PolyUtil::isLocationOnEdge(const LatLng& point, const LatLngList& polygon, bool geodesic = true, double tolerance = PolyUtil::DEFAULT_TOLERANCE)`** - Computes whether the given point lies on or near to a polyline, or the edge of a polygon, within a specified tolerance. Returns true when the difference between the latitude and longitude of the supplied point, and the closest point on the edge, is less than the tolerance. The tolerance defaults to `0.1` meters.
 
 * `point` - a point in geographical coordinates: latitude and longitude
 * `polygon` - a series of connected coordinates in an ordered sequence
-* `tolerance` - tolerance value in meters
 * `geodesic` - the polyline is composed of great circle segments if geodesic is true, and of Rhumb segments otherwise
+* `tolerance` - tolerance value in meters
 
 Return value: `bool` - whether the given point lies on or near the edge of a polygon
 
@@ -155,12 +155,12 @@ std::cout << PolyUtil::isLocationOnEdge(LatLng(0, 90 - big),   equator); // fals
 ---
 
 <a name="isLocationOnPath"></a>
-**`PolyUtil::isLocationOnPath(const LatLng& point, const LatLngList& polyline, double tolerance = PolyUtil::DEFAULT_TOLERANCE, bool geodesic = true)`** - Computes whether the given point lies on or near a polyline, within a specified tolerance in meters. The polyline is composed of great circle segments if geodesic is true, and of Rhumb segments otherwise. The polyline is not closed -- the closing segment between the first point and the last point is not included.
+**`PolyUtil::isLocationOnPath(const LatLng& point, const LatLngList& polyline, bool geodesic = true, double tolerance = PolyUtil::DEFAULT_TOLERANCE)`** - Computes whether the given point lies on or near a polyline, within a specified tolerance in meters. The polyline is composed of great circle segments if geodesic is true, and of Rhumb segments otherwise. The polyline is not closed -- the closing segment between the first point and the last point is not included.
 
 * `point` - a point in geographical coordinates: latitude and longitude
 * `polygon` - a series of connected coordinates in an ordered sequence
-* `tolerance` - tolerance value in meters
 * `geodesic` - the polyline is composed of great circle segments if geodesic is true, and of Rhumb segments otherwise
+* `tolerance` - tolerance value in meters
 
 Return value: `bool` - whether the point lies on or near a polyline
 
@@ -242,17 +242,25 @@ auto back  = SphericalUtil::computeOffset(front, M_PI * MathUtil::EARTH_RADIUS, 
 * `distance` - the distance travelled, in meters.
 * `heading` - the heading in degrees clockwise from north
 
-Return value: `LatLng` - the location of origin when provided with a LatLng destination, meters travelled and original heading. Headings are expressed in degrees clockwise from North
+Return value: `std::optional<LatLng>` - the location of origin, or `std::nullopt` when no solution exists (destination unreachable with the given distance and heading)
 
 ```c++
 LatLng front(0, 0);
 
-assert(front == SphericalUtil::computeOffsetOrigin(front, 0, 0));
+auto r0 = SphericalUtil::computeOffsetOrigin(front, 0, 0);
+assert(r0.has_value() && front == r0.value());
 
-assert(front == SphericalUtil::computeOffsetOrigin(LatLng(  0,  45), M_PI * MathUtil::EARTH_RADIUS / 4,  90));
-assert(front == SphericalUtil::computeOffsetOrigin(LatLng(  0, -45), M_PI * MathUtil::EARTH_RADIUS / 4, -90));
-assert(front == SphericalUtil::computeOffsetOrigin(LatLng( 45,   0), M_PI * MathUtil::EARTH_RADIUS / 4,   0));
-assert(front == SphericalUtil::computeOffsetOrigin(LatLng(-45,   0), M_PI * MathUtil::EARTH_RADIUS / 4, 190));
+auto r1 = SphericalUtil::computeOffsetOrigin(LatLng(  0,  45), M_PI * MathUtil::EARTH_RADIUS / 4,  90);
+auto r2 = SphericalUtil::computeOffsetOrigin(LatLng(  0, -45), M_PI * MathUtil::EARTH_RADIUS / 4, -90);
+auto r3 = SphericalUtil::computeOffsetOrigin(LatLng( 45,   0), M_PI * MathUtil::EARTH_RADIUS / 4,   0);
+auto r4 = SphericalUtil::computeOffsetOrigin(LatLng(-45,   0), M_PI * MathUtil::EARTH_RADIUS / 4, 180);
+assert(r1.has_value() && front == r1.value());
+assert(r2.has_value() && front == r2.value());
+assert(r3.has_value() && front == r3.value());
+assert(r4.has_value() && front == r4.value());
+
+// Returns nullopt when destination is unreachable
+assert(!SphericalUtil::computeOffsetOrigin(LatLng(80, 0), M_PI * MathUtil::EARTH_RADIUS / 4, 180).has_value());
 ```
 
 ---
@@ -291,7 +299,7 @@ Return value: `double` - the distance, in meters, between two LatLngs
 LatLng up(90, 0);
 LatLng down(-90, 0);
 
-std:cout << SphericalUtil::computeDistanceBetween(up, down); // MathUtil::EARTH_RADIUS
+std::cout << SphericalUtil::computeDistanceBetween(up, down); // MathUtil::EARTH_RADIUS
 ```
 
 ---
@@ -327,7 +335,7 @@ LatLng right = {  0.0, 90.0 };
 
 std::vector<LatLng> path = { right, down, front, up, right };
 
-std::cout << SphericalUtil::computeArea(second); // M_PI * MathUtil::EARTH_RADIUS * MathUtil::EARTH_RADIUS
+std::cout << SphericalUtil::computeArea(path); // M_PI * MathUtil::EARTH_RADIUS * MathUtil::EARTH_RADIUS
 ```
 
 ---
