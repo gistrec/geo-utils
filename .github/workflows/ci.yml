@@ -7,29 +7,22 @@ on:
     branches: [master]
 
 jobs:
-  gtest:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtest-dev pkg-config
+      - name: Configure
+        run: cmake -S . -B build -DBUILD_TESTING=ON
 
-      - name: Build tests
-        run: make gtests
+      - name: Build
+        run: cmake --build build --config Release
 
-      - name: Run tests
-        run: ./gtests --gtest_filter=*
-
-  samples:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build sample
-        run: make sample
-
-      - name: Run sample
-        run: ./sample
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure

@@ -15,13 +15,31 @@ target_compile_features(CppGeometryLibrary INTERFACE cxx_std_17)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
     if(BUILD_TESTING)
-        find_package(GTest REQUIRED)
+        find_package(GTest QUIET)
+        if(NOT GTest_FOUND)
+            include(FetchContent)
+            FetchContent_Declare(
+                googletest
+                URL https://github.com/google/googletest/archive/v1.14.0.tar.gz
+                DOWNLOAD_EXTRACT_TIMESTAMP ON
+            )
+            # Prevent overriding the parent project's compiler/linker settings on Windows
+            set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+            FetchContent_MakeAvailable(googletest)
+            # FetchContent creates 'gtest'/'gtest_main'; alias to match find_package names
+            add_library(GTest::GTest ALIAS gtest)
+            add_library(GTest::Main  ALIAS gtest_main)
+        endif()
+
         add_executable(cpp_geometry_tests tests/Tests.cpp)
         target_link_libraries(cpp_geometry_tests
             PRIVATE CppGeometryLibrary GTest::GTest GTest::Main
         )
         add_test(NAME cpp_geometry_tests COMMAND cpp_geometry_tests)
     endif()
+
+    add_executable(cpp_geometry_sample samples/samples.cpp)
+    target_link_libraries(cpp_geometry_sample PRIVATE CppGeometryLibrary)
 endif()
 
 # Installation
