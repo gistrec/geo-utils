@@ -11,8 +11,8 @@
 // This file has been modified from the original work,
 // including a port from Java to C++.
 
-#ifndef GEOMETRY_LIBRARY_MATH_UTIL
-#define GEOMETRY_LIBRARY_MATH_UTIL
+#ifndef CPP_GEOMETRY_LIBRARY_MATH_UTIL
+#define CPP_GEOMETRY_LIBRARY_MATH_UTIL
 
 #include <cmath>
 #include <algorithm>
@@ -122,4 +122,4 @@ public:
     }
 };
 
-#endif // GEOMETRY_LIBRARY_MATH_UTIL
+#endif // CPP_GEOMETRY_LIBRARY_MATH_UTIL

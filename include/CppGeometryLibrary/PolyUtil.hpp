@@ -11,8 +11,8 @@
 // This file has been modified from the original work,
 // including a port from Java to C++.
 
-#ifndef GEOMETRY_LIBRARY_POLY_UTIL
-#define GEOMETRY_LIBRARY_POLY_UTIL
+#ifndef CPP_GEOMETRY_LIBRARY_POLY_UTIL
+#define CPP_GEOMETRY_LIBRARY_POLY_UTIL
 
 #include "MathUtil.hpp"
 #include "SphericalUtil.hpp"
@@ -308,4 +308,4 @@ private:
     }
 };
 
-#endif // GEOMETRY_LIBRARY_POLY_UTIL
+#endif // CPP_GEOMETRY_LIBRARY_POLY_UTIL

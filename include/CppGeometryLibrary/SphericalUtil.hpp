@@ -11,8 +11,8 @@
 // This file has been modified from the original work,
 // including a port from Java to C++.
 
-#ifndef GEOMETRY_LIBRARY_SPHERICAL_UTIL
-#define GEOMETRY_LIBRARY_SPHERICAL_UTIL
+#ifndef CPP_GEOMETRY_LIBRARY_SPHERICAL_UTIL
+#define CPP_GEOMETRY_LIBRARY_SPHERICAL_UTIL
 
 #include <optional>
 
@@ -255,4 +255,4 @@ private:
     }
 };
 
-#endif // GEOMETRY_LIBRARY_SPHERICAL_UTIL
+#endif // CPP_GEOMETRY_LIBRARY_SPHERICAL_UTIL

@@ -11,8 +11,8 @@
 // This file has been modified from the original work,
 // including a port from Java to C++.
 
-#ifndef GEOMETRY_LIBRARY_LATLNG
-#define GEOMETRY_LIBRARY_LATLNG
+#ifndef CPP_GEOMETRY_LIBRARY_LATLNG
+#define CPP_GEOMETRY_LIBRARY_LATLNG
 
 #include <cmath>
 
@@ -53,4 +53,4 @@ private:
     }
 };
 
-#endif // GEOMETRY_LIBRARY_LATLNG
+#endif // CPP_GEOMETRY_LIBRARY_LATLNG
