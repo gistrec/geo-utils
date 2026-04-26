@@ -15,6 +15,8 @@
 #ifndef GEOMETRY_LIBRARY_SPHERICAL_UTIL
 #define GEOMETRY_LIBRARY_SPHERICAL_UTIL
 
+#include <optional>
+
 #include "MathUtil.hpp"
 #include "LatLng.hpp"
 
@@ -79,7 +81,7 @@ public:
      * @param distance The distance travelled, in meters.
      * @param heading  The heading in degrees clockwise from north.
      */
-    inline static LatLng computeOffsetOrigin(const LatLng& to, double distance, double heading) {
+    inline static std::optional<LatLng> computeOffsetOrigin(const LatLng& to, double distance, double heading) {
         heading = deg2rad(heading);
         distance /= MathUtil::EARTH_RADIUS;
         // http://lists.maptools.org/pipermail/proj/2008-October/003939.html
@@ -92,10 +94,9 @@ public:
         // back off to the other if we are outside that range.
         double n12 = n1 * n1;
         double discriminant = n2 * n2 * n12 + n12 * n12 - n12 * n4 * n4;
-        
-        // TODO: No real solution which would make sense in LatLng-space.
-        // if (discriminant < 0) return null;
-        
+
+        if (discriminant < 0) return std::nullopt;
+
         double b = n2 * n4 + sqrt(discriminant);
         b /= n1 * n1 + n2 * n2;
         double a = (n4 - n2 * b) / n1;
@@ -106,8 +107,7 @@ public:
             fromLatRadians = atan2((n4 - n2 * b) / n1, b);
         }
 
-        // TODO: No solution which would make sense in LatLng-space.
-        // if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) return null;
+        if (fromLatRadians < -M_PI / 2 || fromLatRadians > M_PI / 2) return std::nullopt;
 
         double fromLngRadians = deg2rad(to.lng) - atan2(n3, n1 * cos(fromLatRadians) - n2 * sin(fromLatRadians));
         return LatLng(rad2deg(fromLatRadians), rad2deg(fromLngRadians));

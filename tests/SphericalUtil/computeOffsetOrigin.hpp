@@ -6,34 +6,55 @@
 TEST(SphericalUtil, computeOffsetOrigin) {
     LatLng front = {  0.0,    0.0 };
 
-    EXPECT_NEAR_LatLng(front, SphericalUtil::computeOffsetOrigin(front, 0, 0));
+    // Zero distance: origin equals destination
+    {
+        auto r = SphericalUtil::computeOffsetOrigin(front, 0, 0);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR_LatLng(front, r.value());
+    }
 
-    EXPECT_NEAR_LatLng(front, SphericalUtil::computeOffsetOrigin(LatLng(  0,  45), M_PI * MathUtil::EARTH_RADIUS / 4,  90));
-    EXPECT_NEAR_LatLng(front, SphericalUtil::computeOffsetOrigin(LatLng(  0, -45), M_PI * MathUtil::EARTH_RADIUS / 4, -90));
-    EXPECT_NEAR_LatLng(front, SphericalUtil::computeOffsetOrigin(LatLng( 45,   0), M_PI * MathUtil::EARTH_RADIUS / 4,   0));
-    EXPECT_NEAR_LatLng(front, SphericalUtil::computeOffsetOrigin(LatLng(-45,   0), M_PI * MathUtil::EARTH_RADIUS / 4, 180));
+    // Valid cardinal recoveries
+    {
+        auto r = SphericalUtil::computeOffsetOrigin(LatLng(  0,  45), M_PI * MathUtil::EARTH_RADIUS / 4,  90);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR_LatLng(front, r.value());
+    }
+    {
+        auto r = SphericalUtil::computeOffsetOrigin(LatLng(  0, -45), M_PI * MathUtil::EARTH_RADIUS / 4, -90);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR_LatLng(front, r.value());
+    }
+    {
+        auto r = SphericalUtil::computeOffsetOrigin(LatLng( 45,   0), M_PI * MathUtil::EARTH_RADIUS / 4,   0);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR_LatLng(front, r.value());
+    }
+    {
+        auto r = SphericalUtil::computeOffsetOrigin(LatLng(-45,   0), M_PI * MathUtil::EARTH_RADIUS / 4, 180);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR_LatLng(front, r.value());
+    }
 
-    // Issue #3
-    // Situations with no solution, should return null.
-    //
-    // First 'over' the pole.
-    // EXPECT_NULL(SphericalUtil::computeOffsetOrigin(LatLng(80, 0), M_PI * MathUtil::EARTH_RADIUS / 4, 180));
-
-    // Second a distance that doesn't fit on the earth.
-    // EXPECT_NULL(SphericalUtil::computeOffsetOrigin(LatLng(80, 0), M_PI * MathUtil::EARTH_RADIUS / 4, 90));
+    // No-solution cases (Issue #3): destination unreachable with given distance and heading.
+    // heading=180 (south): origin would need lat > 90°.
+    EXPECT_FALSE(SphericalUtil::computeOffsetOrigin(LatLng(80, 0), M_PI * MathUtil::EARTH_RADIUS / 4, 180).has_value());
+    // heading=90 (east): moving east never changes latitude, so (80°,0°) is unreachable.
+    EXPECT_FALSE(SphericalUtil::computeOffsetOrigin(LatLng(80, 0), M_PI * MathUtil::EARTH_RADIUS / 4,  90).has_value());
 
     // Longitude regression: computeOffset({0,30}, 45° arc, east) = {0,75},
     // so the inverse must recover lng=30, not just lat.
     {
-        LatLng result = SphericalUtil::computeOffsetOrigin(LatLng(0, 75), M_PI * MathUtil::EARTH_RADIUS / 4, 90);
-        EXPECT_NEAR(result.lat,  0.0, 1e-6);
-        EXPECT_NEAR(result.lng, 30.0, 1e-6);
+        auto r = SphericalUtil::computeOffsetOrigin(LatLng(0, 75), M_PI * MathUtil::EARTH_RADIUS / 4, 90);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR(r->lat,  0.0, 1e-6);
+        EXPECT_NEAR(r->lng, 30.0, 1e-6);
     }
 
     // Same check heading west: computeOffset({0,-30}, 45° arc, west) = {0,-75}
     {
-        LatLng result = SphericalUtil::computeOffsetOrigin(LatLng(0, -75), M_PI * MathUtil::EARTH_RADIUS / 4, -90);
-        EXPECT_NEAR(result.lat,   0.0, 1e-6);
-        EXPECT_NEAR(result.lng, -30.0, 1e-6);
+        auto r = SphericalUtil::computeOffsetOrigin(LatLng(0, -75), M_PI * MathUtil::EARTH_RADIUS / 4, -90);
+        ASSERT_TRUE(r.has_value());
+        EXPECT_NEAR(r->lat,   0.0, 1e-6);
+        EXPECT_NEAR(r->lng, -30.0, 1e-6);
     }
 }
