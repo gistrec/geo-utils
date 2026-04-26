@@ -44,8 +44,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         endif()
     endif()
 
-    add_executable(cpp_geometry_sample samples/samples.cpp)
-    target_link_libraries(cpp_geometry_sample PRIVATE CppGeometryLibrary)
+    add_subdirectory(examples)
 endif()
 
 # Installation
