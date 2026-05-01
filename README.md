@@ -13,8 +13,19 @@
     <a href="https://github.com/gistrec/cpp-geometry-library/releases">
         <img src="https://img.shields.io/github/v/release/gistrec/cpp-geometry-library" alt="Release">
     </a>
+</p>
+<p align="left">
     <a href="#">
-      <img src="https://img.shields.io/badge/platform-windows%20%7C%20linux%20%7C%20osx-brightgreen" alt="Supported platforms">
+      <img src="https://img.shields.io/badge/C%2B%2B-17-blue" alt="C++17">
+    </a>
+    <a href="#">
+      <img src="https://img.shields.io/badge/CMake-3.14%2B-064F8C?logo=cmake&logoColor=white" alt="CMake 3.14+">
+    </a>
+    <a href="#">
+      <img src="https://img.shields.io/badge/header--only-yes-brightgreen" alt="Header-only">
+    </a>
+    <a href="#">
+      <img src="https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows-brightgreen" alt="Supported platforms">
     </a>
     <a href="https://github.com/gistrec/cpp-geometry-library/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/gistrec/cpp-geometry-library?color=brightgreen" alt="License">
