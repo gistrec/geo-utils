@@ -1,22 +1,64 @@
+# Cross-platform / multi-compiler build & test.
+#
+# Configures, builds, and runs the full test suite (unit tests + examples
+# registered as ctest) on:
+#   - Ubuntu (gcc and clang)
+#   - macOS  (AppleClang)
+#   - Windows (MSVC)
+#
+# Triggered automatically on push/PR to master/main; can also be run manually
+# from the Actions tab in GitHub UI.
+
 name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
   pull_request:
-    branches: [master]
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
+    name: ${{ matrix.name }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - name: ubuntu-gcc
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+          - name: ubuntu-clang
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+          - name: macos
+            os: macos-latest
+          - name: windows
+            os: windows-latest
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      CC:  ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache FetchContent dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ runner.os }}-${{ matrix.name }}-googletest-1.14.0
 
       - name: Configure
         run: cmake -S . -B build -DBUILD_TESTING=ON
@@ -26,29 +68,3 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
-
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install gcovr
-        run: pip install gcovr
-
-      - name: Configure
-        run: cmake -S . -B build -DBUILD_TESTING=ON -DENABLE_COVERAGE=ON
-
-      - name: Build
-        run: cmake --build build
-
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
-
-      - name: Generate coverage report
-        run: gcovr --xml coverage.xml --root . --filter 'include/' build/
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml

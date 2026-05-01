@@ -1,5 +1,4 @@
 ---
 exclude_paths:
   - tests/
-  - samples/
-  - GTests/
+  - examples/
