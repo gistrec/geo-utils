@@ -25,3 +25,20 @@ build/
 *.exe
 *.out
 *.app
+
+# CMake / clangd
+compile_commands.json
+CMakeUserPresets.json
+
+# OS-generated
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Tool sessions
+.claude/

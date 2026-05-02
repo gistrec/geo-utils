@@ -13,13 +13,13 @@
 include(FetchContent)
 
 FetchContent_Declare(
-    CppGeometryLibrary
-    GIT_REPOSITORY https://github.com/gistrec/cpp-geometry-library.git
+    GeoUtils
+    GIT_REPOSITORY https://github.com/gistrec/geo-utils.git
     GIT_TAG        v1.0.0
 )
-FetchContent_MakeAvailable(CppGeometryLibrary)
+FetchContent_MakeAvailable(GeoUtils)
 
-target_link_libraries(your_target PRIVATE CppGeometryLibrary::CppGeometryLibrary)
+target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
 ### find_package
@@ -27,8 +27,8 @@ target_link_libraries(your_target PRIVATE CppGeometryLibrary::CppGeometryLibrary
 Install the library first, then:
 
 ```cmake
-find_package(CppGeometryLibrary REQUIRED)
-target_link_libraries(your_target PRIVATE CppGeometryLibrary::CppGeometryLibrary)
+find_package(GeoUtils 1.0 REQUIRED)
+target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
 ### Manual
@@ -36,20 +36,21 @@ target_link_libraries(your_target PRIVATE CppGeometryLibrary::CppGeometryLibrary
 Copy the `include/` directory into your project and add it to your compiler's include path:
 
 ```sh
-g++ main.cpp -std=c++17 -I/path/to/cpp-geometry-library/include -o main
+g++ main.cpp -std=c++17 -I/path/to/geo-utils/include -o main
 ```
 
 ## Usage
 
-Include the full library or individual modules:
+Include the umbrella header or individual modules:
 
 ```cpp
 // Everything at once
-#include <CppGeometryLibrary.hpp>
+#include <geo/geo.hpp>
 
 // Or individual modules
-#include <CppGeometryLibrary/SphericalUtil.hpp>
-#include <CppGeometryLibrary/PolyUtil.hpp>
+#include <geo/latlng.hpp>
+#include <geo/spherical.hpp>
+#include <geo/poly.hpp>
 ```
 
 ### Example: distance and heading between two points
@@ -57,19 +58,35 @@ Include the full library or individual modules:
 ```cpp
 #include <iostream>
 
-#include <CppGeometryLibrary/LatLng.hpp>
-#include <CppGeometryLibrary/SphericalUtil.hpp>
+#include <geo/spherical.hpp>
 
 int main() {
-    LatLng newYork = { 40.7128, -74.0060 };
-    LatLng london  = { 51.5074,  -0.1278 };
+    geo::LatLng newYork = { 40.7128, -74.0060 };
+    geo::LatLng london  = { 51.5074,  -0.1278 };
 
-    double distance = SphericalUtil::computeDistanceBetween(newYork, london);
-    double heading  = SphericalUtil::computeHeading(newYork, london);
+    double distance = geo::distance_between(newYork, london);
+    double heading  = geo::heading(newYork, london);
 
     std::cout << "Distance: " << distance / 1000.0 << " km\n";
     std::cout << "Heading:  " << heading << " deg\n";
 }
+```
+
+### Example: approximate equality with custom tolerance
+
+`LatLng::operator==` is an approximate comparison with tolerance `1e-12` degrees
+(≈ 0.1 nm). For comparisons at coarser scale — e.g. metre precision — pass an
+explicit tolerance to `approx_equal`:
+
+```cpp
+#include <geo/spherical.hpp>
+
+geo::LatLng start{40.0, -74.0};
+geo::LatLng end = geo::offset(start, 100'000.0, 90.0);     // 100 km east
+auto recovered  = geo::offset_origin(end, 100'000.0, 90.0);
+
+assert(recovered.has_value());
+assert(recovered->approx_equal(start, 1e-6));   // ~10 cm tolerance
 ```
 
 ### Example: point-in-polygon
@@ -78,21 +95,20 @@ int main() {
 #include <iostream>
 #include <vector>
 
-#include <CppGeometryLibrary/LatLng.hpp>
-#include <CppGeometryLibrary/PolyUtil.hpp>
+#include <geo/poly.hpp>
 
 int main() {
-    std::vector<LatLng> polygon = {
+    std::vector<geo::LatLng> polygon = {
         { 40.7650, -73.9900 },
         { 40.7650, -73.9700 },
         { 40.7450, -73.9700 },
         { 40.7450, -73.9900 },
     };
 
-    LatLng timesSquare = { 40.7580, -73.9855 };
+    geo::LatLng timesSquare = { 40.7580, -73.9855 };
 
     std::cout << std::boolalpha;
-    std::cout << PolyUtil::containsLocation(timesSquare, polygon) << "\n"; // true
+    std::cout << geo::contains(timesSquare, polygon) << "\n"; // true
 }
 ```
 

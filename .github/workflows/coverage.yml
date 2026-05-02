@@ -1,0 +1,69 @@
+# Code coverage report.
+#
+# Builds the test suite with --coverage instrumentation (gcov), runs all tests,
+# then generates a Cobertura-XML report scoped to include/ (the public headers).
+# The report is uploaded to Codecov for tracking over time.
+#
+# Linux-only: relies on gcc + gcov; the ENABLE_COVERAGE option in CMakeLists.txt
+# is GCC/Clang-specific.
+#
+# Triggered automatically on push/PR to master/main; can also be run manually
+# from the Actions tab in GitHub UI.
+
+name: Coverage
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache FetchContent dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ runner.os }}-coverage-googletest-1.14.0
+
+      - name: Install gcovr
+        run: pip install gcovr
+
+      - name: Configure
+        run: cmake -S . -B build -DBUILD_TESTING=ON -DENABLE_COVERAGE=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Generate coverage report
+        run: gcovr --xml coverage.xml --root . --filter 'include/' build/
+
+      # Skip upload on PRs from forks: secrets.CODECOV_TOKEN is unavailable to
+      # workflows running on PRs from forked repositories, and a missing token
+      # would otherwise cause the upload to fail. Coverage instrumentation is
+      # still exercised by the steps above — useful for catching regressions
+      # even when the report can't be uploaded. fail_ci_if_error=false is a
+      # belt-and-suspenders safeguard: even on push/own-repo PRs, transient
+      # Codecov errors should not block CI.
+      - name: Upload coverage to Codecov
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          fail_ci_if_error: false

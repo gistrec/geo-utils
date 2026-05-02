@@ -1,0 +1,60 @@
+# Install + downstream consumer integration test.
+#
+# Installs the library to a temporary prefix, then configures and builds a
+# minimal consumer project (tests/consumer/) against that prefix using
+# `find_package(GeoUtils 1.0 REQUIRED)` and `target_link_libraries(... geo::utils)`.
+# Runs the consumer to verify end-to-end integration.
+#
+# Catches regressions in install paths, exported target names, and
+# CMake config files — the kind of bug that pure unit tests can't see.
+#
+# Runs on Linux/macOS/Windows in parallel.
+# Triggered automatically on push/PR to master/main; can also be run manually
+# from the Actions tab in GitHub UI.
+
+name: Install
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-consumer:
+    name: install + consumer (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure library
+        run: cmake -S . -B build
+
+      - name: Build library
+        run: cmake --build build --config Release
+
+      - name: Install library
+        run: cmake --install build --config Release --prefix ${{ runner.temp }}/prefix
+
+      - name: Configure consumer
+        run: cmake -S tests/consumer -B build-consumer -DCMAKE_PREFIX_PATH=${{ runner.temp }}/prefix
+
+      - name: Build consumer
+        run: cmake --build build-consumer --config Release
+
+      - name: Test consumer
+        run: ctest --test-dir build-consumer -C Release --output-on-failure

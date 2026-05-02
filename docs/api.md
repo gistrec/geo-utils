@@ -1,5 +1,8 @@
 # API Reference
 
+All public symbols live in the `geo::` namespace. Helpers under `geo::detail::`
+are internal and not part of the supported API.
+
 ## Conventions
 
 - Coordinates are in degrees (latitude, longitude)
@@ -17,43 +20,71 @@
 Represents a geographic coordinate (latitude, longitude) in degrees.
 
 ```cpp
-#include <CppGeometryLibrary/LatLng.hpp>
+#include <geo/latlng.hpp>
 ```
 
-`LatLng` - a point in geographical coordinates: latitude and longitude.
+`geo::LatLng` — a point in geographical coordinates: latitude and longitude.
 
 * Latitude  ranges between `-90` and `90` degrees, inclusive
 * Longitude ranges between `-180` and `180` degrees, inclusive. Note: `180` and `-180` are treated as equal.
 
 ```cpp
-LatLng northPole{90, 0};
-LatLng otherPoint = northPole;
+geo::LatLng northPole{90, 0};
+geo::LatLng otherPoint = northPole;
 ```
 
----
+### Equality
 
-## LatLngList
+`operator==` performs an **approximate** comparison with tolerance
+`LatLng::kDefaultEpsilon` (= `1e-12` degrees, ≈ 0.1 nanometers on Earth).
+Longitudes are compared modulo 360°, so `LatLng(0, 180) == LatLng(0, -180)`.
 
-A series of connected coordinates in an ordered sequence. Any iterable container of `LatLng` (e.g. std::vector, std::array).
+For custom tolerance — e.g. comparing computation results at meter scale —
+use `approx_equal`:
 
 ```cpp
-std::vector<LatLng> aroundNorthPole = { {89, 0}, {89, 120}, {89, -120} };
-std::array<LatLng, 1U> northPole = { {90, 0} };
+geo::LatLng a{40.7128, -74.0060};
+geo::LatLng b{40.71280001, -74.00599999};
+
+a == b;                    // false (off by ~1e-7°, exceeds default 1e-12)
+a.approx_equal(b, 1e-5);   // true (1e-5° ≈ 1 m on equator)
 ```
 
 ---
 
-## SphericalUtil
+## Path
+
+A series of connected coordinates in an ordered sequence.
+
+`Path` is a template parameter accepted by `path_length`, `area`, `signed_area`,
+`contains`, `on_edge`, and `on_path`. It must be a random-access container of
+`geo::LatLng` — specifically, it must support:
+
+- `path.size()` returning a size in elements
+- `path[i]` returning a `LatLng` (or something convertible) for `0 ≤ i < size`
+
+This includes `std::vector`, `std::array`, `std::span` (C++20), and
+`std::deque`. Forward-only containers like `std::list`, and `std::initializer_list`
+(no `operator[]`), are **not** supported — wrap them in a `std::vector` first.
+
+```cpp
+std::vector<geo::LatLng> aroundNorthPole = { {89, 0}, {89, 120}, {89, -120} };
+std::array<geo::LatLng, 1U> northPole = { {90, 0} };
+```
+
+---
+
+## Spherical functions
 
 Spherical geometry utilities for computing angles, distances, and areas.
 
 ```cpp
-#include <CppGeometryLibrary/SphericalUtil.hpp>
+#include <geo/spherical.hpp>
 ```
 
-### computeHeading
+### heading
 
-**`SphericalUtil::computeHeading(const LatLng& from, const LatLng& to)`** — Returns the heading from one LatLng to another LatLng. Headings are expressed in degrees clockwise from North within the range `[-180, 180)`.
+**`geo::heading(const LatLng& from, const LatLng& to)`** — Returns the heading from one LatLng to another. Headings are expressed in degrees clockwise from North within the range `[-180, 180)`.
 
 * `from` — the starting point
 * `to` — the destination point
@@ -61,18 +92,18 @@ Spherical geometry utilities for computing angles, distances, and areas.
 Returns: `double` — the heading in degrees clockwise from north
 
 ```cpp
-LatLng front{0,  0};
-LatLng right{0, 90};
+geo::LatLng front{0,  0};
+geo::LatLng right{0, 90};
 
-std::cout << SphericalUtil::computeHeading(right, front); // -90
-std::cout << SphericalUtil::computeHeading(front, right); // +90
+std::cout << geo::heading(right, front); // -90
+std::cout << geo::heading(front, right); // +90
 ```
 
 ---
 
-### computeOffset
+### offset
 
-**`SphericalUtil::computeOffset(const LatLng& from, double distance, double heading)`** — Returns the LatLng resulting from moving a distance from an origin in the specified heading (expressed in degrees clockwise from north).
+**`geo::offset(const LatLng& from, double distance, double heading)`** — Returns the LatLng resulting from moving a distance from an origin in the specified heading (degrees clockwise from north).
 
 * `from` — the starting point
 * `distance` — the distance to travel, in meters
@@ -81,19 +112,22 @@ std::cout << SphericalUtil::computeHeading(front, right); // +90
 Returns: `LatLng` — the destination point
 
 ```cpp
-LatLng front{0, 0};
+geo::LatLng front{0, 0};
 
-auto up    = SphericalUtil::computeOffset(front, M_PI * MathUtil::EARTH_RADIUS / 2,   0); // LatLng{ 90,    0}
-auto down  = SphericalUtil::computeOffset(front, M_PI * MathUtil::EARTH_RADIUS / 2, 180); // LatLng{-90,    0}
-auto left  = SphericalUtil::computeOffset(front, M_PI * MathUtil::EARTH_RADIUS / 2, -90); // LatLng{  0,  -90}
-auto right = SphericalUtil::computeOffset(front, M_PI * MathUtil::EARTH_RADIUS / 2,  90); // LatLng{  0,   90}
+// quarter-circumference of Earth ≈ 10,007.5 km
+constexpr double quarter = 10'007'543.4;
+
+auto up    = geo::offset(front, quarter,   0); // {  90,    0}
+auto down  = geo::offset(front, quarter, 180); // { -90,    0}
+auto left  = geo::offset(front, quarter, -90); // {   0,  -90}
+auto right = geo::offset(front, quarter,  90); // {   0,   90}
 ```
 
 ---
 
-### computeOffsetOrigin
+### offset_origin
 
-**`SphericalUtil::computeOffsetOrigin(const LatLng& to, double distance, double heading)`** — Returns the origin point that, when travelling `distance` meters at `heading`, arrives at `to`. Returns `std::nullopt` when no solution exists.
+**`geo::offset_origin(const LatLng& to, double distance, double heading)`** — Returns the origin point that, when travelling `distance` meters at `heading`, arrives at `to`. Returns `std::nullopt` when no solution exists.
 
 * `to` — the destination point
 * `distance` — the distance travelled, in meters
@@ -102,216 +136,174 @@ auto right = SphericalUtil::computeOffset(front, M_PI * MathUtil::EARTH_RADIUS /
 Returns: `std::optional<LatLng>` — the origin, or `std::nullopt` if unreachable
 
 ```cpp
-LatLng front{0, 0};
+geo::LatLng front{0, 0};
 
-auto r0 = SphericalUtil::computeOffsetOrigin(front, 0, 0);
+auto r0 = geo::offset_origin(front, 0, 0);
 assert(r0.has_value() && front == r0.value());
-
-// Returns nullopt when destination is unreachable
-assert(!SphericalUtil::computeOffsetOrigin(LatLng{80, 0}, M_PI * MathUtil::EARTH_RADIUS / 4, 180).has_value());
 ```
 
 ---
 
 ### interpolate
 
-**`SphericalUtil::interpolate(const LatLng& from, const LatLng& to, double fraction)`** — Returns the LatLng which lies the given fraction of the way between the origin LatLng and the destination LatLng (spherical linear interpolation).
+**`geo::interpolate(const LatLng& from, const LatLng& to, double fraction)`** — Returns the LatLng which lies the given fraction of the way between the origin and the destination (spherical linear interpolation).
 
 * `from` — the starting point
 * `to` — the destination point
 * `fraction` — a value in `[0, 1]`
 
-Returns: `LatLng` — the interpolated point
+Returns: `LatLng`
 
 ```cpp
-LatLng up{90, 0};
-LatLng front{0, 0};
+geo::LatLng up{90, 0};
+geo::LatLng front{0, 0};
 
-assert(LatLng{1,  0} == SphericalUtil::interpolate(front, up,  1 / 90.0));
-assert(LatLng{89, 0} == SphericalUtil::interpolate(front, up, 89 / 90.0));
+assert(geo::LatLng{1,  0} == geo::interpolate(front, up,  1 / 90.0));
+assert(geo::LatLng{89, 0} == geo::interpolate(front, up, 89 / 90.0));
 ```
 
 ---
 
-### computeAngleBetween
+### angle_between
 
-**`SphericalUtil::computeAngleBetween(const LatLng& from, const LatLng& to)`** — Returns the central angle between two points, in radians.
+**`geo::angle_between(const LatLng& from, const LatLng& to)`** — Returns the central angle between two points, in radians.
 
-* `from` — the first point
-* `to` — the second point
-
-Returns: `double` — the angle in radians
+Returns: `double`
 
 ---
 
-### computeDistanceBetween
+### distance_between
 
-**`SphericalUtil::computeDistanceBetween(const LatLng& from, const LatLng& to)`** — Returns the distance between two points, in meters.
+**`geo::distance_between(const LatLng& from, const LatLng& to)`** — Returns the distance between two points, in meters.
 
-* `from` — the first point
-* `to` — the second point
-
-Returns: `double` — the distance in meters
+Returns: `double`
 
 ```cpp
-LatLng up{90, 0};
-LatLng down{-90, 0};
+geo::LatLng up{90, 0};
+geo::LatLng down{-90, 0};
 
-std::cout << SphericalUtil::computeDistanceBetween(up, down); // ~2.00151e+07
+std::cout << geo::distance_between(up, down); // ~2.00151e+07
 ```
 
 ---
 
-### computeLength
+### path_length
 
-**`SphericalUtil::computeLength(const LatLngList& path)`** — Returns the length of the given path, in meters.
+**`geo::path_length(const Path& path)`** — Returns the length of the given path, in meters.
 
-* `path` — a sequence of points
-
-Returns: `double` — the total path length in meters
+Returns: `double`
 
 ```cpp
-std::vector<LatLng> path = { {0, 0}, {90, 0}, {0, 90} };
-std::cout << SphericalUtil::computeLength(path); // ~M_PI * MathUtil::EARTH_RADIUS
+std::vector<geo::LatLng> path = { {0, 0}, {90, 0}, {0, 90} };
+std::cout << geo::path_length(path); // ~20,015,087 m (pi*R)
 ```
 
 ---
 
-### computeArea
+### area
 
-**`SphericalUtil::computeArea(const LatLngList& path)`** — Returns the area of a closed path on Earth.
+**`geo::area(const Path& path)`** — Returns the area of a closed path on Earth, in square meters.
 
-* `path` — a closed sequence of points
-
-Returns: `double` — the area in square meters
+Returns: `double`
 
 ```cpp
-std::vector<LatLng> path = { {0, 90}, {-90, 0}, {0, 0}, {90, 0}, {0, 90} };
-std::cout << SphericalUtil::computeArea(path); // ~M_PI * EARTH_RADIUS²
+// Lune bounded by meridians 0 and 90 — one quarter of the Earth's surface.
+std::vector<geo::LatLng> path = { {0, 90}, {-90, 0}, {0, 0}, {90, 0}, {0, 90} };
+std::cout << geo::area(path); // ~pi*R^2 (one quarter of the total 4*pi*R^2)
 ```
 
 ---
 
-### computeSignedArea
+### signed_area
 
-**`SphericalUtil::computeSignedArea(const LatLngList& path)`** — Returns the signed area of a closed path. The sign indicates orientation: positive for counter-clockwise, negative for clockwise. "Inside" is the surface that does not contain the South Pole.
+**`geo::signed_area(const Path& path)`** — Returns the signed area of a closed path on Earth, in square meters.
 
-This follows the convention used in Google Maps geometry utilities.
+Sign convention: **counter-clockwise** when viewed from outside the
+"inside" face of the polygon yields a **positive** result; clockwise yields a
+negative result. "Inside" is the surface that does not contain the South Pole,
+so for a small polygon in the northern hemisphere CCW means CCW as seen from
+above the North Pole.
 
-* `path` — a closed sequence of points
-
-Returns: `double` — the signed area in square meters
+Returns: `double`
 
 ```cpp
-std::vector<LatLng> path         = { {0, 90}, { 90, 0}, {0, 0}, {-90, 0}, {0, 90} };
-std::vector<LatLng> pathReversed = { {0, 90}, {-90, 0}, {0, 0}, { 90, 0}, {0, 90} };
+// Triangle in the northern hemisphere, CCW when viewed from above the North Pole
+std::vector<geo::LatLng> ccw = { {0, 0}, {0, 10}, {10, 0}, {0, 0} };
+std::vector<geo::LatLng> cw  = { {0, 0}, {10, 0}, {0, 10}, {0, 0} };
 
-assert(SphericalUtil::computeSignedArea(path) == -SphericalUtil::computeSignedArea(pathReversed));
+assert(geo::signed_area(ccw) >  0);
+assert(geo::signed_area(cw)  <  0);
+assert(geo::signed_area(ccw) == -geo::signed_area(cw));
 ```
 
 ---
 
-## PolyUtil
+## Polygon functions
 
 Utilities for computations involving polygons and polylines.
 
 ```cpp
-#include <CppGeometryLibrary/PolyUtil.hpp>
+#include <geo/poly.hpp>
 ```
 
-### containsLocation
+### contains
 
-**`PolyUtil::containsLocation(const LatLng& point, const LatLngList& polygon, bool geodesic = false)`** — Returns whether the given point lies inside the specified polygon. The polygon is always considered closed. The South Pole is always outside.
+**`geo::contains(const LatLng& point, const Path& polygon, bool geodesic = false)`** — Returns whether the given point lies inside the specified polygon. The polygon is always considered closed. The South Pole is always outside.
 
-* `point` — the point to test
-* `polygon` — the polygon vertices
 * `geodesic` — `true` for great circle edges, `false` for rhumb edges
 
 Returns: `bool`
 
 ```cpp
-std::vector<LatLng> aroundNorthPole = { {89, 0}, {89, 120}, {89, -120} };
+std::vector<geo::LatLng> aroundNorthPole = { {89, 0}, {89, 120}, {89, -120} };
 
-std::cout << PolyUtil::containsLocation(LatLng{90, 0},  aroundNorthPole); // true
-std::cout << PolyUtil::containsLocation(LatLng{-90, 0}, aroundNorthPole); // false
+std::cout << geo::contains(geo::LatLng{90, 0},  aroundNorthPole); // true
+std::cout << geo::contains(geo::LatLng{-90, 0}, aroundNorthPole); // false
 ```
 
 ---
 
-### isLocationOnEdge
+### on_edge
 
-**`PolyUtil::isLocationOnEdge(const LatLng& point, const LatLngList& polygon, bool geodesic = true, double tolerance = 0.1)`** — Returns whether the given point lies on or near a polygon edge, within `tolerance` meters.
-
-* `point` — the point to test
-* `polygon` — the polygon vertices
-* `geodesic` — `true` for great circle edges, `false` for rhumb edges
-* `tolerance` — tolerance in meters (default `0.1`)
+**`geo::on_edge(const LatLng& point, const Path& polygon, bool geodesic = true, double tolerance = geo::kDefaultTolerance)`** — Returns whether the given point lies on or near a polygon edge, within `tolerance` meters.
 
 Returns: `bool`
 
 ```cpp
-std::vector<LatLng> equator = { {0, 90}, {0, 180} };
+std::vector<geo::LatLng> equator = { {0, 90}, {0, 180} };
 
-double small = 5e-7; // within tolerance
-double big   = 2e-6; // outside tolerance
-
-std::cout << PolyUtil::isLocationOnEdge(LatLng{0, 90 - small}, equator); // true
-std::cout << PolyUtil::isLocationOnEdge(LatLng{0, 90 - big},   equator); // false
+std::cout << geo::on_edge(geo::LatLng{0, 90 - 5e-7}, equator); // true
+std::cout << geo::on_edge(geo::LatLng{0, 90 - 2e-6}, equator); // false
 ```
 
 ---
 
-### isLocationOnPath
+### on_path
 
-**`PolyUtil::isLocationOnPath(const LatLng& point, const LatLngList& polyline, bool geodesic = true, double tolerance = 0.1)`** — Returns whether the given point lies on or near a polyline, within `tolerance` meters. The closing segment between the first and last points is not included.
-
-* `point` — the point to test
-* `polyline` — the polyline vertices
-* `geodesic` — `true` for great circle segments, `false` for rhumb segments
-* `tolerance` — tolerance in meters (default `0.1`)
+**`geo::on_path(const LatLng& point, const Path& polyline, bool geodesic = true, double tolerance = geo::kDefaultTolerance)`** — Returns whether the given point lies on or near a polyline, within `tolerance` meters. The closing segment between the first and last points is **not** included.
 
 Returns: `bool`
 
-```cpp
-std::vector<LatLng> equator = { {0, 90}, {0, 180} };
+---
 
-std::cout << PolyUtil::isLocationOnPath(LatLng{0, 90}, equator); // true
+### distance_to_segment
+
+**`geo::distance_to_segment(const LatLng& point, const LatLng& start, const LatLng& end)`** — Returns the distance in meters from `point` to the line segment `[start, end]` on the sphere.
+
+Returns: `double`
+
+```cpp
+geo::LatLng start{28.05359, -82.41632};
+geo::LatLng end{28.05310, -82.41634};
+geo::LatLng point{28.05342, -82.41594};
+
+std::cout << geo::distance_to_segment(point, start, end); // ~37.95
 ```
 
 ---
 
-### distanceToLine
+## Constants
 
-**`PolyUtil::distanceToLine(const LatLng& point, const LatLng& start, const LatLng& end)`** — Returns the distance in meters from `point` to the line segment `[start, end]` on the sphere.
-
-* `point` — the point to measure from
-* `start` — the start of the segment
-* `end` — the end of the segment
-
-Returns: `double` — the distance in meters
-
-```cpp
-LatLng start{28.05359, -82.41632};
-LatLng end{28.05310, -82.41634};
-LatLng point{28.05342, -82.41594};
-
-std::cout << PolyUtil::distanceToLine(point, start, end); // ~37.95
-```
-
----
-
-## MathUtil
-
-Low-level math helpers used internally. Available for direct use if needed.
-
-```cpp
-#include <CppGeometryLibrary/MathUtil.hpp>
-```
-
-| Symbol | Type | Description |
+| Symbol | Value | Description |
 |---|---|---|
-| `MathUtil::EARTH_RADIUS` | `double` | Mean Earth radius: `6371009.0` m (IUGG) |
-| `MathUtil::clamp(x, low, high)` | `double` | Clamps `x` to `[low, high]` |
-| `MathUtil::wrap(n, min, max)` | `double` | Wraps `n` into `[min, max)` |
-| `MathUtil::deg2rad(degrees)` | `double` | Converts degrees to radians |
-| `MathUtil::rad2deg(radians)` | `double` | Converts radians to degrees |
+| `geo::kDefaultTolerance` | `0.1` | Default tolerance in meters for `on_edge` / `on_path` |

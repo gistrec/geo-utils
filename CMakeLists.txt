@@ -1,15 +1,20 @@
 cmake_minimum_required(VERSION 3.14)
-project(CppGeometryLibrary VERSION 1.0.0 LANGUAGES CXX)
+project(GeoUtils VERSION 1.0.0 LANGUAGES CXX)
+
+option(ENABLE_COVERAGE "Enable gcov coverage instrumentation (GCC/Clang only). Requires BUILD_TESTING=ON." OFF)
 
 # Header-only interface target
-add_library(CppGeometryLibrary INTERFACE)
-add_library(CppGeometryLibrary::CppGeometryLibrary ALIAS CppGeometryLibrary)
+add_library(geo_utils INTERFACE)
+add_library(geo::utils ALIAS geo_utils)
 
-target_include_directories(CppGeometryLibrary INTERFACE
+# So the exported imported target is geo::utils (matches the build-tree alias)
+set_target_properties(geo_utils PROPERTIES EXPORT_NAME utils)
+
+target_include_directories(geo_utils INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_compile_features(CppGeometryLibrary INTERFACE cxx_std_17)
+target_compile_features(geo_utils INTERFACE cxx_std_17)
 
 # Tests (optional, enabled when this is the top-level project)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -25,22 +30,23 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
             )
             # Prevent overriding the parent project's compiler/linker settings on Windows
             set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+            # Don't leak GTest into our install prefix
+            set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
             FetchContent_MakeAvailable(googletest)
             # FetchContent creates 'gtest'/'gtest_main'; alias to match find_package names
             add_library(GTest::GTest ALIAS gtest)
             add_library(GTest::Main  ALIAS gtest_main)
         endif()
 
-        add_executable(cpp_geometry_tests tests/Tests.cpp)
-        target_link_libraries(cpp_geometry_tests
-            PRIVATE CppGeometryLibrary GTest::GTest GTest::Main
+        add_executable(geo_utils_tests tests/tests.cpp)
+        target_link_libraries(geo_utils_tests
+            PRIVATE geo::utils GTest::GTest GTest::Main
         )
-        add_test(NAME cpp_geometry_tests COMMAND cpp_geometry_tests)
+        add_test(NAME geo_utils_tests COMMAND geo_utils_tests)
 
-        option(ENABLE_COVERAGE "Enable gcov coverage instrumentation (GCC/Clang only)" OFF)
         if(ENABLE_COVERAGE)
-            target_compile_options(cpp_geometry_tests PRIVATE --coverage)
-            target_link_options(cpp_geometry_tests PRIVATE --coverage)
+            target_compile_options(geo_utils_tests PRIVATE --coverage)
+            target_link_options(geo_utils_tests PRIVATE --coverage)
         endif()
     endif()
 
@@ -53,29 +59,29 @@ include(GNUInstallDirs)
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-install(TARGETS CppGeometryLibrary
-    EXPORT CppGeometryLibraryTargets
+install(TARGETS geo_utils
+    EXPORT GeoUtilsTargets
 )
-install(EXPORT CppGeometryLibraryTargets
-    FILE CppGeometryLibraryTargets.cmake
-    NAMESPACE CppGeometryLibrary::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CppGeometryLibrary
+install(EXPORT GeoUtilsTargets
+    FILE GeoUtilsTargets.cmake
+    NAMESPACE geo::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtils
 )
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-    cmake/CppGeometryLibraryConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/CppGeometryLibraryConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CppGeometryLibrary
+    cmake/GeoUtilsConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/GeoUtilsConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtils
 )
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/CppGeometryLibraryConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/GeoUtilsConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
-    COMPATIBILITY AnyNewerVersion
+    COMPATIBILITY SameMajorVersion
 )
 install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/CppGeometryLibraryConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/CppGeometryLibraryConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CppGeometryLibrary
+    ${CMAKE_CURRENT_BINARY_DIR}/GeoUtilsConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/GeoUtilsConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtils
 )
