@@ -38,18 +38,18 @@ struct LatLng {
      * latitude and longitude). Longitudes are compared modulo 360 so that 180°
      * and -180° are treated as equal (same meridian).
      */
-    bool approx_equal(const LatLng& other, double eps = kDefaultEpsilon) const noexcept {
+    [[nodiscard]] bool approx_equal(const LatLng& other, double eps = kDefaultEpsilon) const noexcept {
         if (std::fabs(lat - other.lat) >= eps) return false;
         double diff = std::fabs(std::fmod(lng - other.lng, 360.0));
         if (diff > 180.0) diff = 360.0 - diff;
         return diff < eps;
     }
 
-    bool operator==(const LatLng& other) const noexcept {
+    [[nodiscard]] bool operator==(const LatLng& other) const noexcept {
         return approx_equal(other);
     }
 
-    bool operator!=(const LatLng& other) const noexcept {
+    [[nodiscard]] bool operator!=(const LatLng& other) const noexcept {
         return !(*this == other);
     }
 

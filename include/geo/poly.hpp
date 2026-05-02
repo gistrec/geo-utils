@@ -28,18 +28,18 @@ inline constexpr double kDefaultTolerance = 0.1;  // meters
 namespace detail {
 
 // Returns tan(latitude-at-lng3) on the great circle (lat1, 0) to (lat2, lng2).
-inline double tan_lat_gc(double lat1, double lat2, double lng2, double lng3) noexcept {
+[[nodiscard]] inline double tan_lat_gc(double lat1, double lat2, double lng2, double lng3) noexcept {
     return (std::tan(lat1) * std::sin(lng2 - lng3) + std::tan(lat2) * std::sin(lng3)) / std::sin(lng2);
 }
 
 // Returns mercator(latitude-at-lng3) on the Rhumb line (lat1, 0) to (lat2, lng2).
-inline double mercator_lat_rhumb(double lat1, double lat2, double lng2, double lng3) noexcept {
+[[nodiscard]] inline double mercator_lat_rhumb(double lat1, double lat2, double lng2, double lng3) noexcept {
     return (mercator(lat1) * (lng2 - lng3) + mercator(lat2) * lng3) / lng2;
 }
 
 // Computes whether the vertical segment (lat3, lng3) to South Pole intersects
 // the segment (lat1, 0) to (lat2, lng2). Longitudes are offset so lng1 == 0.
-inline bool intersects(double lat1, double lat2, double lng2, double lat3, double lng3, bool geodesic) noexcept {
+[[nodiscard]] inline bool intersects(double lat1, double lat2, double lng2, double lat3, double lng3, bool geodesic) noexcept {
     if ((lng3 >= 0 && lng3 >= lng2) || (lng3 < 0 && lng3 < lng2)) {
         return false;
     }
@@ -66,7 +66,7 @@ inline bool intersects(double lat1, double lat2, double lng2, double lat3, doubl
 
 // Returns sin(initial bearing from (lat1,lng1) to (lat3,lng3) minus initial
 // bearing from (lat1,lng1) to (lat2,lng2)).
-inline double sin_delta_bearing(double lat1, double lng1, double lat2, double lng2, double lat3, double lng3) noexcept {
+[[nodiscard]] inline double sin_delta_bearing(double lat1, double lng1, double lat2, double lng2, double lat3, double lng3) noexcept {
     double sin_lat1 = std::sin(lat1);
     double cos_lat2 = std::cos(lat2);
     double cos_lat3 = std::cos(lat3);
@@ -82,7 +82,7 @@ inline double sin_delta_bearing(double lat1, double lng1, double lat2, double ln
     return denom <= 0 ? 1 : (a * d - b * c) / std::sqrt(denom);
 }
 
-inline bool is_on_segment_gc(double lat1, double lng1, double lat2, double lng2, double lat3, double lng3, double hav_tolerance) noexcept {
+[[nodiscard]] inline bool is_on_segment_gc(double lat1, double lng1, double lat2, double lng2, double lat3, double lng3, double hav_tolerance) noexcept {
     double hav_dist13 = hav_distance(lat1, lat3, lng1 - lng3);
     if (hav_dist13 <= hav_tolerance) {
         return true;
@@ -114,7 +114,7 @@ inline bool is_on_segment_gc(double lat1, double lng1, double lat2, double lng2,
 
 // Computes whether a given point lies on or near a polyline within a tolerance.
 template <typename Path>
-bool on_edge_or_path(const LatLng& point, const Path& poly, bool closed, bool geodesic, double tolerance_earth) {
+[[nodiscard]] bool on_edge_or_path(const LatLng& point, const Path& poly, bool closed, bool geodesic, double tolerance_earth) {
     std::size_t size = poly.size();
     if (size == 0U) {
         return false;
@@ -187,7 +187,7 @@ bool on_edge_or_path(const LatLng& point, const Path& poly, bool closed, bool ge
  * the South Pole. Edges are great circle arcs if geodesic is true, rhumb lines otherwise.
  */
 template <typename Path>
-bool contains(const LatLng& point, const Path& polygon, bool geodesic = false) {
+[[nodiscard]] bool contains(const LatLng& point, const Path& polygon, bool geodesic = false) {
     std::size_t size = polygon.size();
     if (size == 0) {
         return false;
@@ -223,7 +223,7 @@ bool contains(const LatLng& point, const Path& polygon, bool geodesic = false) {
  * within a specified tolerance in meters. The polygon is implicitly closed.
  */
 template <typename Path>
-bool on_edge(const LatLng& point, const Path& polygon, bool geodesic = true, double tolerance = kDefaultTolerance) {
+[[nodiscard]] bool on_edge(const LatLng& point, const Path& polygon, bool geodesic = true, double tolerance = kDefaultTolerance) {
     return detail::on_edge_or_path(point, polygon, true, geodesic, tolerance);
 }
 
@@ -232,7 +232,7 @@ bool on_edge(const LatLng& point, const Path& polygon, bool geodesic = true, dou
  * specified tolerance in meters. The polyline is not closed.
  */
 template <typename Path>
-bool on_path(const LatLng& point, const Path& polyline, bool geodesic = true, double tolerance = kDefaultTolerance) {
+[[nodiscard]] bool on_path(const LatLng& point, const Path& polyline, bool geodesic = true, double tolerance = kDefaultTolerance) {
     return detail::on_edge_or_path(point, polyline, false, geodesic, tolerance);
 }
 
@@ -240,7 +240,7 @@ bool on_path(const LatLng& point, const Path& polyline, bool geodesic = true, do
  * Computes the spherical distance between the point p and the line segment
  * (start, end), in meters.
  */
-inline double distance_to_segment(const LatLng& p, const LatLng& start, const LatLng& end) noexcept {
+[[nodiscard]] inline double distance_to_segment(const LatLng& p, const LatLng& start, const LatLng& end) noexcept {
     if (start == end) {
         return distance_between(end, p);
     }

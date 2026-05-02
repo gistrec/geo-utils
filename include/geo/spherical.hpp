@@ -27,7 +27,7 @@ namespace geo {
  * Returns the heading from one LatLng to another LatLng. Headings are
  * expressed in degrees clockwise from North within the range [-180, 180).
  */
-inline double heading(const LatLng& from, const LatLng& to) noexcept {
+[[nodiscard]] inline double heading(const LatLng& from, const LatLng& to) noexcept {
     double from_lat = detail::deg2rad(from.lat);
     double from_lng = detail::deg2rad(from.lng);
     double to_lat = detail::deg2rad(to.lat);
@@ -44,7 +44,7 @@ inline double heading(const LatLng& from, const LatLng& to) noexcept {
  * Returns the LatLng resulting from moving a distance from an origin
  * in the specified heading (expressed in degrees clockwise from north).
  */
-inline LatLng offset(const LatLng& from, double distance, double heading_deg) noexcept {
+[[nodiscard]] inline LatLng offset(const LatLng& from, double distance, double heading_deg) noexcept {
     distance /= detail::kEarthRadius;
     double heading_rad = detail::deg2rad(heading_deg);
     double from_lat = detail::deg2rad(from.lat);
@@ -66,7 +66,7 @@ inline LatLng offset(const LatLng& from, double distance, double heading_deg) no
  * Returns the location of origin when provided with a destination,
  * meters travelled and original heading. Returns nullopt when no solution exists.
  */
-inline std::optional<LatLng> offset_origin(const LatLng& to, double distance, double heading_deg) noexcept {
+[[nodiscard]] inline std::optional<LatLng> offset_origin(const LatLng& to, double distance, double heading_deg) noexcept {
     double heading_rad = detail::deg2rad(heading_deg);
     distance /= detail::kEarthRadius;
     double n1 = std::cos(distance);
@@ -96,7 +96,7 @@ inline std::optional<LatLng> offset_origin(const LatLng& to, double distance, do
  * Returns the angle between two LatLngs, in radians. This is the same as the
  * distance on the unit sphere.
  */
-inline double angle_between(const LatLng& from, const LatLng& to) noexcept {
+[[nodiscard]] inline double angle_between(const LatLng& from, const LatLng& to) noexcept {
     double lat1 = detail::deg2rad(from.lat);
     double lng1 = detail::deg2rad(from.lng);
     double lat2 = detail::deg2rad(to.lat);
@@ -107,7 +107,7 @@ inline double angle_between(const LatLng& from, const LatLng& to) noexcept {
 /**
  * Returns the distance between two LatLngs, in meters.
  */
-inline double distance_between(const LatLng& from, const LatLng& to) noexcept {
+[[nodiscard]] inline double distance_between(const LatLng& from, const LatLng& to) noexcept {
     return angle_between(from, to) * detail::kEarthRadius;
 }
 
@@ -115,7 +115,7 @@ inline double distance_between(const LatLng& from, const LatLng& to) noexcept {
  * Returns the LatLng which lies the given fraction of the way between the
  * origin and the destination (spherical linear interpolation).
  */
-inline LatLng interpolate(const LatLng& from, const LatLng& to, double fraction) noexcept {
+[[nodiscard]] inline LatLng interpolate(const LatLng& from, const LatLng& to, double fraction) noexcept {
     double from_lat = detail::deg2rad(from.lat);
     double from_lng = detail::deg2rad(from.lng);
     double to_lat = detail::deg2rad(to.lat);
@@ -143,7 +143,7 @@ inline LatLng interpolate(const LatLng& from, const LatLng& to, double fraction)
  * Returns the length of the given path, in meters, on Earth.
  */
 template <typename Path>
-double path_length(const Path& path) {
+[[nodiscard]] double path_length(const Path& path) {
     const std::size_t size = path.size();
     if (size < 2U) {
         return 0.0;
@@ -169,7 +169,7 @@ double path_length(const Path& path) {
  * "Inside" is the surface that does not contain the South Pole.
  */
 template <typename Path>
-double signed_area(const Path& path) {
+[[nodiscard]] double signed_area(const Path& path) {
     std::size_t size = path.size();
     if (size < 3U) { return 0.0; }
     double total = 0.0;
@@ -196,7 +196,7 @@ double signed_area(const Path& path) {
  * Returns the area of a closed path on Earth.
  */
 template <typename Path>
-double area(const Path& path) {
+[[nodiscard]] double area(const Path& path) {
     return std::abs(signed_area(path));
 }
 
