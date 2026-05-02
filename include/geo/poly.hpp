@@ -161,7 +161,7 @@ bool on_edge_or_path(const LatLng& point, const Path& poly, bool closed, bool ge
                 for (auto x3 : x_try) {
                     double dy = y2 - y1;
                     double len2 = x2 * x2 + dy * dy;
-                    double t = len2 <= 0 ? 0 : clamp((x3 * x2 + (y3 - y1) * dy) / len2, 0.0, 1.0);
+                    double t = len2 <= 0 ? 0 : std::clamp((x3 * x2 + (y3 - y1) * dy) / len2, 0.0, 1.0);
                     double x_closest = t * x2;
                     double y_closest = y1 + t * dy;
                     double lat_closest = inverse_mercator(y_closest);

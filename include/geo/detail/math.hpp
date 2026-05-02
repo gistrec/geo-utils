@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 
 namespace geo::detail {
@@ -30,11 +31,6 @@ inline double deg2rad(double degrees) noexcept {
 
 inline double rad2deg(double angle) noexcept {
     return angle * 180.0 / kPi;
-}
-
-// Restrict x to the range [low, high].
-inline double clamp(double x, double low, double high) noexcept {
-    return x < low ? low : (x > high ? high : x);
 }
 
 // Returns the non-negative remainder of x / m.
@@ -66,7 +62,7 @@ inline double hav(double x) noexcept {
 
 // Inverse haversine. arc_hav(x) == 2 * asin(sqrt(x)). Argument must be in [0, 1].
 inline double arc_hav(double x) noexcept {
-    return 2.0 * std::asin(std::sqrt(clamp(x, 0.0, 1.0)));
+    return 2.0 * std::asin(std::sqrt(std::clamp(x, 0.0, 1.0)));
 }
 
 // Given h == hav(x), returns sin(abs(x)).

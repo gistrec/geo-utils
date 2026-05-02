@@ -32,12 +32,6 @@ TEST(Math, wrap) {
     EXPECT_NEAR(wrap(-180.0, -180.0, 180.0),-180.0, 1e-10);
 }
 
-TEST(Math, clamp) {
-    EXPECT_NEAR(clamp( 5.0, 0.0, 10.0),  5.0, 1e-10);
-    EXPECT_NEAR(clamp(-1.0, 0.0, 10.0),  0.0, 1e-10);
-    EXPECT_NEAR(clamp(11.0, 0.0, 10.0), 10.0, 1e-10);
-}
-
 TEST(Math, mercator_inverse_mercator) {
     // Equator maps to 0
     EXPECT_NEAR(mercator(0.0),         0.0, 1e-10);

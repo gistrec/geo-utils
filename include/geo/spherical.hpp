@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <optional>
@@ -57,7 +58,7 @@ inline LatLng offset(const LatLng& from, double distance, double heading_deg) no
         sin_distance * cos_from_lat * std::sin(heading_rad),
         cos_distance - sin_from_lat * sin_lat);
 
-    return LatLng(detail::rad2deg(std::asin(detail::clamp(sin_lat, -1.0, 1.0))),
+    return LatLng(detail::rad2deg(std::asin(std::clamp(sin_lat, -1.0, 1.0))),
                   detail::rad2deg(from_lng + d_lng));
 }
 
