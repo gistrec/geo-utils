@@ -130,3 +130,6 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/GeoUtilsConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtils
 )
+
+include(CPack)
+set(CPACK_GENERATOR "ZIP")
