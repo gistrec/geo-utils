@@ -131,5 +131,10 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtils
 )
 
-include(CPack)
-set(CPACK_GENERATOR "ZIP")
+if(_geo_utils_is_top_level)                                                                                                                                                                                                                                                                                                                                               
+    set(CPACK_PACKAGE_NAME    "geo-utils")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")                                                                                                                                                                                                                                                                                                                       
+    set(CPACK_GENERATOR       "ZIP")                                                                                                                                                                                                                                                                                                                                      
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")                                                                                                                                                                                                                                                                                                
+    include(CPack)                                                                                                                                                                                                                                                                                                                                                        
+endif()
