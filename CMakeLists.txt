@@ -32,25 +32,37 @@ if(GEO_UTILS_BUILD_TESTS)
     include(CTest)
     include(GoogleTest)
 
-    find_package(GTest QUIET)
-    if(NOT GTest_FOUND)
-        include(FetchContent)
-        FetchContent_Declare(
-            googletest
-            URL https://github.com/google/googletest/archive/v1.14.0.tar.gz
-            DOWNLOAD_EXTRACT_TIMESTAMP ON
-        )
-        # Prevent overriding the parent project's compiler/linker settings on Windows.
-        # Local (non-cache) variables — relies on CMP0077 (NEW since CMake 3.13,
-        # default at our cmake_minimum_required of 3.14) so the option() calls
-        # inside googletest don't overwrite these.
-        set(gtest_force_shared_crt ON)
-        # Don't leak GTest into our install prefix.
-        set(INSTALL_GTEST OFF)
-        FetchContent_MakeAvailable(googletest)
-        # FetchContent creates 'gtest'/'gtest_main'; alias to match find_package names
-        add_library(GTest::GTest ALIAS gtest)
-        add_library(GTest::Main  ALIAS gtest_main)
+    if(TARGET gtest)
+        # Someone upstream (the consuming project, or an earlier add_subdirectory)
+        # already set up googletest. Reuse those targets — don't try to find or
+        # fetch our own. Add the legacy GTest:: aliases only if they're missing.
+        if(NOT TARGET GTest::GTest)
+            add_library(GTest::GTest ALIAS gtest)
+        endif()
+        if(NOT TARGET GTest::Main)
+            add_library(GTest::Main ALIAS gtest_main)
+        endif()
+    else()
+        find_package(GTest QUIET)
+        if(NOT GTest_FOUND)
+            include(FetchContent)
+            FetchContent_Declare(
+                googletest
+                URL https://github.com/google/googletest/archive/v1.14.0.tar.gz
+                DOWNLOAD_EXTRACT_TIMESTAMP ON
+            )
+            # Prevent overriding the parent project's compiler/linker settings on Windows.
+            # Local (non-cache) variables — relies on CMP0077 (NEW since CMake 3.13,
+            # default at our cmake_minimum_required of 3.14) so the option() calls
+            # inside googletest don't overwrite these.
+            set(gtest_force_shared_crt ON)
+            # Don't leak GTest into our install prefix.
+            set(INSTALL_GTEST OFF)
+            FetchContent_MakeAvailable(googletest)
+            # FetchContent creates 'gtest'/'gtest_main'; alias to match find_package names
+            add_library(GTest::GTest ALIAS gtest)
+            add_library(GTest::Main  ALIAS gtest_main)
+        endif()
     endif()
 
     add_executable(geo_utils_tests tests/tests.cpp)
