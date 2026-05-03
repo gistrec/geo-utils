@@ -36,7 +36,7 @@ geometry, no runtime dependencies.
 - Build options `GEO_UTILS_BUILD_TESTS` and `GEO_UTILS_BUILD_EXAMPLES` —
   default ON when geo-utils is the top-level project, OFF when consumed via
   `add_subdirectory` or `FetchContent`.
-- `ENABLE_COVERAGE` option for gcov instrumentation (GCC/Clang only).
+- `GEO_UTILS_ENABLE_COVERAGE` option for gcov instrumentation (GCC/Clang only).
 
 ### Tests & examples
 

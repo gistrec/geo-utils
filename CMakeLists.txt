@@ -9,7 +9,7 @@ endif()
 
 option(GEO_UTILS_BUILD_TESTS    "Build geo-utils tests"    ${_geo_utils_is_top_level})
 option(GEO_UTILS_BUILD_EXAMPLES "Build geo-utils examples" ${_geo_utils_is_top_level})
-option(ENABLE_COVERAGE          "Enable gcov coverage instrumentation (GCC/Clang only). Requires GEO_UTILS_BUILD_TESTS=ON." OFF)
+option(GEO_UTILS_ENABLE_COVERAGE          "Enable gcov coverage instrumentation (GCC/Clang only). Requires GEO_UTILS_BUILD_TESTS=ON." OFF)
 
 # Header-only interface target
 add_library(geo_utils INTERFACE)
@@ -27,6 +27,7 @@ target_compile_features(geo_utils INTERFACE cxx_std_17)
 # Tests
 if(GEO_UTILS_BUILD_TESTS)
     include(CTest)
+    include(GoogleTest)
 
     find_package(GTest QUIET)
     if(NOT GTest_FOUND)
@@ -36,10 +37,13 @@ if(GEO_UTILS_BUILD_TESTS)
             URL https://github.com/google/googletest/archive/v1.14.0.tar.gz
             DOWNLOAD_EXTRACT_TIMESTAMP ON
         )
-        # Prevent overriding the parent project's compiler/linker settings on Windows
-        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-        # Don't leak GTest into our install prefix
-        set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+        # Prevent overriding the parent project's compiler/linker settings on Windows.
+        # Local (non-cache) variables — relies on CMP0077 (NEW since CMake 3.13,
+        # default at our cmake_minimum_required of 3.14) so the option() calls
+        # inside googletest don't overwrite these.
+        set(gtest_force_shared_crt ON)
+        # Don't leak GTest into our install prefix.
+        set(INSTALL_GTEST OFF)
         FetchContent_MakeAvailable(googletest)
         # FetchContent creates 'gtest'/'gtest_main'; alias to match find_package names
         add_library(GTest::GTest ALIAS gtest)
@@ -50,9 +54,25 @@ if(GEO_UTILS_BUILD_TESTS)
     target_link_libraries(geo_utils_tests
         PRIVATE geo::utils GTest::GTest GTest::Main
     )
-    add_test(NAME geo_utils_tests COMMAND geo_utils_tests)
+    gtest_discover_tests(geo_utils_tests)
 
-    if(ENABLE_COVERAGE)
+    if(GEO_UTILS_ENABLE_COVERAGE)
+        # `--coverage` is split: compile inserts gcov hooks, link pulls in the
+        # gcov runtime. The compiler-flag check must include both stages — see
+        # CMAKE_REQUIRED_LINK_OPTIONS (CMake 3.14+). Otherwise the test object
+        # compiles fine but link fails on missing gcov symbols, giving a false
+        # negative on toolchains that actually support the flag (e.g. AppleClang).
+        include(CheckCXXCompilerFlag)
+        set(CMAKE_REQUIRED_LINK_OPTIONS --coverage)
+        check_cxx_compiler_flag(--coverage GEO_UTILS_HAS_COVERAGE_FLAG)
+        unset(CMAKE_REQUIRED_LINK_OPTIONS)
+
+        if(NOT GEO_UTILS_HAS_COVERAGE_FLAG)
+            message(FATAL_ERROR
+                "GEO_UTILS_ENABLE_COVERAGE=ON requested, but the C++ compiler "
+                "(${CMAKE_CXX_COMPILER_ID}) does not support --coverage. "
+                "Coverage instrumentation requires GCC or Clang.")
+        endif()
         target_compile_options(geo_utils_tests PRIVATE --coverage)
         target_link_options(geo_utils_tests PRIVATE --coverage)
     endif()

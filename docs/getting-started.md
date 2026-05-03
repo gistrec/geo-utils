@@ -116,7 +116,7 @@ int main() {
 
 - `GEO_UTILS_BUILD_TESTS`    — build unit tests (default: ON if top-level, OFF otherwise)
 - `GEO_UTILS_BUILD_EXAMPLES` — build examples   (default: ON if top-level, OFF otherwise)
-- `ENABLE_COVERAGE`          — gcov instrumentation, GCC/Clang only (default: OFF)
+- `GEO_UTILS_ENABLE_COVERAGE` — gcov instrumentation, GCC/Clang only (default: OFF)
 
 ## Building and testing
 
