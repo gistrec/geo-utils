@@ -61,7 +61,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.name }}-googletest-1.14.0
 
       - name: Configure
-        run: cmake -S . -B build -DBUILD_TESTING=ON
+        run: cmake -S . -B build -DGEO_UTILS_BUILD_TESTS=ON -DGEO_UTILS_BUILD_EXAMPLES=ON
 
       - name: Build
         run: cmake --build build --config Release

@@ -42,7 +42,7 @@ jobs:
         run: pip install gcovr
 
       - name: Configure
-        run: cmake -S . -B build -DBUILD_TESTING=ON -DENABLE_COVERAGE=ON
+        run: cmake -S . -B build -DGEO_UTILS_BUILD_TESTS=ON -DENABLE_COVERAGE=ON
 
       - name: Build
         run: cmake --build build

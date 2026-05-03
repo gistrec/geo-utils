@@ -33,7 +33,10 @@ geometry, no runtime dependencies.
 - `find_package(GeoUtils 1.0 REQUIRED)` after `cmake --install`.
 - `FetchContent_Declare(GeoUtils ...)` for in-tree consumption.
 - `SameMajorVersion` package compatibility.
-- `ENABLE_COVERAGE` option for gcov instrumentation (GCC/Clang).
+- Build options `GEO_UTILS_BUILD_TESTS` and `GEO_UTILS_BUILD_EXAMPLES` —
+  default ON when geo-utils is the top-level project, OFF when consumed via
+  `add_subdirectory` or `FetchContent`.
+- `ENABLE_COVERAGE` option for gcov instrumentation (GCC/Clang only).
 
 ### Tests & examples
 

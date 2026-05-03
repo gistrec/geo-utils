@@ -112,10 +112,16 @@ int main() {
 }
 ```
 
+## Build options
+
+- `GEO_UTILS_BUILD_TESTS`    — build unit tests (default: ON if top-level, OFF otherwise)
+- `GEO_UTILS_BUILD_EXAMPLES` — build examples   (default: ON if top-level, OFF otherwise)
+- `ENABLE_COVERAGE`          — gcov instrumentation, GCC/Clang only (default: OFF)
+
 ## Building and testing
 
 ```sh
-cmake -S . -B build -DBUILD_TESTING=ON
+cmake -S . -B build
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
