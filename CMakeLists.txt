@@ -7,9 +7,12 @@ else()
     set(_geo_utils_is_top_level OFF)
 endif()
 
+include(CMakeDependentOption)
 option(GEO_UTILS_BUILD_TESTS    "Build geo-utils tests"    ${_geo_utils_is_top_level})
 option(GEO_UTILS_BUILD_EXAMPLES "Build geo-utils examples" ${_geo_utils_is_top_level})
-option(GEO_UTILS_ENABLE_COVERAGE          "Enable gcov coverage instrumentation (GCC/Clang only). Requires GEO_UTILS_BUILD_TESTS=ON." OFF)
+cmake_dependent_option(GEO_UTILS_ENABLE_COVERAGE
+    "Enable gcov coverage instrumentation (GCC/Clang only)" OFF
+    "GEO_UTILS_BUILD_TESTS" OFF)
 
 # Header-only interface target
 add_library(geo_utils INTERFACE)
