@@ -1,0 +1,9 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+includedir=${prefix}/@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: geo-utils
+Description: Header-only C++ geographic utilities
+URL: https://github.com/gistrec/geo-utils
+Version: @PROJECT_VERSION@
+Cflags: -I${includedir}

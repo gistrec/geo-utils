@@ -131,6 +131,19 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtils
 )
 
+# pkg-config
+option(GEO_UTILS_INSTALL_PKGCONFIG "Install a pkg-config (.pc) file" ON)
+if(GEO_UTILS_INSTALL_PKGCONFIG)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/geo-utils.pc.in
+        ${CMAKE_CURRENT_BINARY_DIR}/geo-utils.pc
+        @ONLY
+    )
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/geo-utils.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+endif()
+
 if(_geo_utils_is_top_level)                                                                                                                                                                                                                                                                                                                                               
     set(CPACK_PACKAGE_NAME    "geo-utils")
     set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")                                                                                                                                                                                                                                                                                                                       
