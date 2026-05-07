@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.0.1
+
+Renamed package to `geo-utils-cpp` to avoid a name collision with an existing
+`geo-utils` component on [repology](https://repology.org). The public C++ API
+is unchanged — downstream source code does not need to be updated.
+
+### Changed
+
+- pkg-config name: `geo-utils` → `geo-utils-cpp` (`.pc` file installed as
+  `geo-utils-cpp.pc`).
+- CPack package name: `geo-utils` → `geo-utils-cpp`.
+- CMake package name: `find_package(GeoUtils ...)` → `find_package(GeoUtilsCpp ...)`.
+  Config files install to `${CMAKE_INSTALL_LIBDIR}/cmake/GeoUtilsCpp/` as
+  `GeoUtilsCppConfig.cmake`, `GeoUtilsCppConfigVersion.cmake`, and
+  `GeoUtilsCppTargets.cmake`.
+- Build options renamed with `GEO_UTILS_CPP_` prefix:
+  `GEO_UTILS_BUILD_TESTS` → `GEO_UTILS_CPP_BUILD_TESTS`,
+  `GEO_UTILS_BUILD_EXAMPLES` → `GEO_UTILS_CPP_BUILD_EXAMPLES`,
+  `GEO_UTILS_ENABLE_COVERAGE` → `GEO_UTILS_CPP_ENABLE_COVERAGE`,
+  `GEO_UTILS_INSTALL_PKGCONFIG` → `GEO_UTILS_CPP_INSTALL_PKGCONFIG`.
+
+### Unchanged (downstream-compatible)
+
+- Imported target `geo::utils`.
+- C++ namespace `geo::` and `geo::detail::`.
+- Public headers: `<geo/geo.hpp>`, `<geo/latlng.hpp>`, `<geo/spherical.hpp>`,
+  `<geo/poly.hpp>`.
+
 ## v1.0.0
 
 Initial stable release. Header-only C++17 library for spherical geographic

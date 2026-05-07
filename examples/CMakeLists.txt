@@ -1,7 +1,7 @@
 foreach(example spherical poly)
     add_executable(example_${example} ${example}.cpp)
     target_link_libraries(example_${example} PRIVATE geo::utils)
-    if(GEO_UTILS_BUILD_TESTS)
+    if(GEO_UTILS_CPP_BUILD_TESTS)
         add_test(NAME example_${example} COMMAND example_${example})
     endif()
 endforeach()

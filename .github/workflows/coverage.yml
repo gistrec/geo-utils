@@ -4,7 +4,7 @@
 # then generates a Cobertura-XML report scoped to include/ (the public headers).
 # The report is uploaded to Codecov for tracking over time.
 #
-# Linux-only: relies on gcc + gcov; the GEO_UTILS_ENABLE_COVERAGE option in CMakeLists.txt
+# Linux-only: relies on gcc + gcov; the GEO_UTILS_CPP_ENABLE_COVERAGE option in CMakeLists.txt
 # is GCC/Clang-specific.
 #
 # Triggered automatically on push/PR to master/main; can also be run manually
@@ -36,13 +36,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: ${{ runner.os }}-coverage-googletest-1.14.0
+          # Include repo name in the key so a repo rename (which changes the
+          # absolute work-dir path baked into FetchContent's subbuild cache)
+          # invalidates stale caches automatically.
+          key: ${{ runner.os }}-coverage-${{ github.event.repository.name }}-googletest-1.14.0
 
       - name: Install gcovr
         run: pip install gcovr
 
       - name: Configure
-        run: cmake -S . -B build -DGEO_UTILS_BUILD_TESTS=ON -DGEO_UTILS_ENABLE_COVERAGE=ON
+        run: cmake -S . -B build -DGEO_UTILS_CPP_BUILD_TESTS=ON -DGEO_UTILS_CPP_ENABLE_COVERAGE=ON
 
       - name: Build
         run: cmake --build build
