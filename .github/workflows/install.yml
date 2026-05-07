@@ -41,14 +41,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # CMAKE_INSTALL_PREFIX is set at configure time so it's baked into the
+      # generated .pc file; the install step must not pass --prefix or the
+      # .pc would point at the configure-time prefix while files land elsewhere.
       - name: Configure library
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DCMAKE_INSTALL_PREFIX=${{ runner.temp }}/prefix
 
       - name: Build library
         run: cmake --build build --config Release
 
       - name: Install library
-        run: cmake --install build --config Release --prefix ${{ runner.temp }}/prefix
+        run: cmake --install build --config Release
 
       # pkg-config sanity: catches regressions in the .pc template, including
       # malformed includedirs (doubled prefix → //) and non-relocatable templates

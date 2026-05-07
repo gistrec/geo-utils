@@ -1,5 +1,4 @@
-prefix=${pcfiledir}/../..
-exec_prefix=${prefix}
+prefix=@CMAKE_INSTALL_PREFIX@
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: geo-utils-cpp
