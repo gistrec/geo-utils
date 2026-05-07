@@ -36,7 +36,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: ${{ runner.os }}-coverage-googletest-1.14.0
+          # Include repo name in the key so a repo rename (which changes the
+          # absolute work-dir path baked into FetchContent's subbuild cache)
+          # invalidates stale caches automatically.
+          key: ${{ runner.os }}-coverage-${{ github.event.repository.name }}-googletest-1.14.0
 
       - name: Install gcovr
         run: pip install gcovr
