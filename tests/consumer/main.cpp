@@ -1,4 +1,4 @@
-// Smoke test for an installed geo-utils package.
+// Smoke test for an installed geo-utils-cpp package.
 // Verifies that <geo/geo.hpp> is reachable, geo::utils target links, and
 // the basic public API produces a sensible result.
 

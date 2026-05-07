@@ -1,17 +1,17 @@
-# geo-utils
+# geo-utils-cpp
 
 <p align="left">
-    <a href="https://github.com/gistrec/geo-utils/actions/workflows/ci.yml">
-        <img src="https://github.com/gistrec/geo-utils/actions/workflows/ci.yml/badge.svg" alt="CI">
+    <a href="https://github.com/gistrec/geo-utils-cpp/actions/workflows/ci.yml">
+        <img src="https://github.com/gistrec/geo-utils-cpp/actions/workflows/ci.yml/badge.svg" alt="CI">
     </a>
-    <a href="https://app.codacy.com/gh/gistrec/geo-utils/dashboard">
+    <a href="https://app.codacy.com/gh/gistrec/geo-utils-cpp/dashboard">
       <img src="https://img.shields.io/codacy/grade/bcff544711544d5fb7da95b68abf566d" alt="Code quality">
     </a>
-    <a href="https://codecov.io/gh/gistrec/geo-utils">
-      <img src="https://codecov.io/gh/gistrec/geo-utils/graph/badge.svg" alt="Coverage">
+    <a href="https://codecov.io/gh/gistrec/geo-utils-cpp">
+      <img src="https://codecov.io/gh/gistrec/geo-utils-cpp/graph/badge.svg" alt="Coverage">
     </a>
-    <a href="https://github.com/gistrec/geo-utils/releases">
-        <img src="https://img.shields.io/github/v/release/gistrec/geo-utils" alt="Release">
+    <a href="https://github.com/gistrec/geo-utils-cpp/releases">
+        <img src="https://img.shields.io/github/v/release/gistrec/geo-utils-cpp" alt="Release">
     </a>
 </p>
 <p align="left">
@@ -27,8 +27,8 @@
     <a href="#">
       <img src="https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows-brightgreen" alt="Supported platforms">
     </a>
-    <a href="https://github.com/gistrec/geo-utils/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/gistrec/geo-utils?color=brightgreen" alt="License">
+    <a href="https://github.com/gistrec/geo-utils-cpp/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/gistrec/geo-utils-cpp?color=brightgreen" alt="License">
     </a>
 </p>
 
@@ -64,11 +64,11 @@ Uses spherical Earth approximation (like Google Maps).
 include(FetchContent)
 
 FetchContent_Declare(
-    GeoUtils
-    GIT_REPOSITORY https://github.com/gistrec/geo-utils.git
-    GIT_TAG        v1.0.0
+    GeoUtilsCpp
+    GIT_REPOSITORY https://github.com/gistrec/geo-utils-cpp.git
+    GIT_TAG        v1.0.1
 )
-FetchContent_MakeAvailable(GeoUtils)
+FetchContent_MakeAvailable(GeoUtilsCpp)
 
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
@@ -76,7 +76,7 @@ target_link_libraries(your_target PRIVATE geo::utils)
 ### find_package
 
 ```cmake
-find_package(GeoUtils 1.0 REQUIRED)
+find_package(GeoUtilsCpp 1.0 REQUIRED)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
@@ -111,7 +111,7 @@ See [docs/api.md](docs/api.md) for the full API reference.
 
 ## Support
 
-[Please open an issue on GitHub](https://github.com/gistrec/geo-utils/issues)
+[Please open an issue on GitHub](https://github.com/gistrec/geo-utils-cpp/issues)
 
 ## License
 

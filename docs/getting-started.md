@@ -13,11 +13,11 @@
 include(FetchContent)
 
 FetchContent_Declare(
-    GeoUtils
-    GIT_REPOSITORY https://github.com/gistrec/geo-utils.git
-    GIT_TAG        v1.0.0
+    GeoUtilsCpp
+    GIT_REPOSITORY https://github.com/gistrec/geo-utils-cpp.git
+    GIT_TAG        v1.0.1
 )
-FetchContent_MakeAvailable(GeoUtils)
+FetchContent_MakeAvailable(GeoUtilsCpp)
 
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
@@ -27,7 +27,7 @@ target_link_libraries(your_target PRIVATE geo::utils)
 Install the library first, then:
 
 ```cmake
-find_package(GeoUtils 1.0 REQUIRED)
+find_package(GeoUtilsCpp 1.0 REQUIRED)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
@@ -36,7 +36,7 @@ target_link_libraries(your_target PRIVATE geo::utils)
 Copy the `include/` directory into your project and add it to your compiler's include path:
 
 ```sh
-g++ main.cpp -std=c++17 -I/path/to/geo-utils/include -o main
+g++ main.cpp -std=c++17 -I/path/to/geo-utils-cpp/include -o main
 ```
 
 ## Usage
@@ -114,9 +114,9 @@ int main() {
 
 ## Build options
 
-- `GEO_UTILS_BUILD_TESTS`    — build unit tests (default: ON if top-level, OFF otherwise)
-- `GEO_UTILS_BUILD_EXAMPLES` — build examples   (default: ON if top-level, OFF otherwise)
-- `GEO_UTILS_ENABLE_COVERAGE` — gcov instrumentation, GCC/Clang only (default: OFF)
+- `GEO_UTILS_CPP_BUILD_TESTS`    — build unit tests (default: ON if top-level, OFF otherwise)
+- `GEO_UTILS_CPP_BUILD_EXAMPLES` — build examples   (default: ON if top-level, OFF otherwise)
+- `GEO_UTILS_CPP_ENABLE_COVERAGE` — gcov instrumentation, GCC/Clang only (default: OFF)
 
 ## Building and testing
 
