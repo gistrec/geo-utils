@@ -5,7 +5,7 @@ project(geo_utils_cpp_consumer LANGUAGES CXX)
 # link against geo::utils, and run a minimal program. Intended to be configured
 # against an install prefix from the install workflow.
 
-find_package(GeoUtilsCpp 1.0 REQUIRED)
+find_package(GeoUtilsCpp 1.0.1 REQUIRED)
 
 add_executable(app main.cpp)
 target_link_libraries(app PRIVATE geo::utils)

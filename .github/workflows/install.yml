@@ -50,6 +50,23 @@ jobs:
       - name: Install library
         run: cmake --install build --config Release --prefix ${{ runner.temp }}/prefix
 
+      # pkg-config sanity: catches regressions in the .pc template (e.g. a
+      # malformed includedir that would expand into a doubled absolute path).
+      # Skipped on Windows — pkg-config isn't part of the default toolchain.
+      - name: Verify pkg-config metadata
+        if: runner.os != 'Windows'
+        env:
+          PKG_CONFIG_PATH: ${{ runner.temp }}/prefix/lib/pkgconfig
+        run: |
+          version=$(pkg-config --modversion geo-utils-cpp)
+          cflags=$(pkg-config --cflags geo-utils-cpp)
+          echo "version: $version"
+          echo "cflags:  $cflags"
+          test "$version" = "1.0.1"
+          case "$cflags" in
+            *//*) echo "ERROR: doubled-slash in include path: $cflags" >&2; exit 1 ;;
+          esac
+
       - name: Configure consumer
         run: cmake -S tests/consumer -B build-consumer -DCMAKE_PREFIX_PATH=${{ runner.temp }}/prefix
 

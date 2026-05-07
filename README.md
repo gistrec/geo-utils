@@ -76,7 +76,7 @@ target_link_libraries(your_target PRIVATE geo::utils)
 ### find_package
 
 ```cmake
-find_package(GeoUtilsCpp 1.0 REQUIRED)
+find_package(GeoUtilsCpp 1.0.1 REQUIRED)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
