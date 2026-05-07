@@ -2,7 +2,7 @@
 #
 # Installs the library to a temporary prefix, then configures and builds a
 # minimal consumer project (tests/consumer/) against that prefix using
-# `find_package(GeoUtilsCpp 1.0 REQUIRED)` and `target_link_libraries(... geo::utils)`.
+# `find_package(GeoUtilsCpp 1.0.1 REQUIRED)` and `target_link_libraries(... geo::utils)`.
 # Runs the consumer to verify end-to-end integration.
 #
 # Catches regressions in install paths, exported target names, and
@@ -50,8 +50,10 @@ jobs:
       - name: Install library
         run: cmake --install build --config Release --prefix ${{ runner.temp }}/prefix
 
-      # pkg-config sanity: catches regressions in the .pc template (e.g. a
-      # malformed includedir that would expand into a doubled absolute path).
+      # pkg-config sanity: catches regressions in the .pc template, including
+      # malformed includedirs (doubled prefix → //) and non-relocatable templates
+      # (the resolved includedir must actually contain our headers, not point at
+      # a configure-time prefix that no longer matches the install location).
       # Skipped on Windows — pkg-config isn't part of the default toolchain.
       - name: Verify pkg-config metadata
         if: runner.os != 'Windows'
@@ -60,12 +62,19 @@ jobs:
         run: |
           version=$(pkg-config --modversion geo-utils-cpp)
           cflags=$(pkg-config --cflags geo-utils-cpp)
-          echo "version: $version"
-          echo "cflags:  $cflags"
+          include_dir=$(pkg-config --variable=includedir geo-utils-cpp)
+          echo "version:    $version"
+          echo "cflags:     $cflags"
+          echo "includedir: $include_dir"
           test "$version" = "1.0.1"
           case "$cflags" in
             *//*) echo "ERROR: doubled-slash in include path: $cflags" >&2; exit 1 ;;
           esac
+          test -f "$include_dir/geo/geo.hpp" || {
+            echo "ERROR: header missing at $include_dir/geo/geo.hpp" >&2
+            echo "  (the .pc file points outside the install prefix — likely a relocation bug)" >&2
+            exit 1
+          }
 
       - name: Configure consumer
         run: cmake -S tests/consumer -B build-consumer -DCMAKE_PREFIX_PATH=${{ runner.temp }}/prefix
