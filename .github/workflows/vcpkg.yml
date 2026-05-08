@@ -1,0 +1,81 @@
+# vcpkg integration smoke test.
+#
+# Installs geo-utils-cpp from the official microsoft/vcpkg registry, then
+# configures and builds the minimal consumer project (tests/consumer/) using
+# the vcpkg CMake toolchain file. Runs on Linux/macOS/Windows in parallel.
+#
+# What this catches:
+#   - Breakage in the published vcpkg port
+#   - Drift in vcpkg infrastructure or GitHub runner images
+#   - Our exported CMake config / target name not surviving an install via vcpkg
+#
+# What this does NOT catch:
+#   - Regressions introduced in this repo on a PR — vcpkg ships the *released*
+#     version (currently 1.0.1), not HEAD. The PR/push runs verify the
+#     published port still works; the weekly schedule catches drift over time.
+#
+# Triggered automatically on push/PR to master/main; runs weekly to catch
+# upstream drift; can also be run manually from the Actions tab.
+
+name: vcpkg
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+  schedule:
+    # Mondays 06:00 UTC. Catches drift in the vcpkg registry / runner images.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vcpkg-consumer:
+    name: vcpkg + consumer (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        # Bash is available on all GH-hosted runners (Git Bash on Windows) and
+        # gives us consistent $VCPKG_INSTALLATION_ROOT expansion across platforms.
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # GH-hosted runners ship vcpkg pre-installed at $VCPKG_INSTALLATION_ROOT.
+      # The bundled checkout can lag the registry by days/weeks, so sync to
+      # origin/master to make sure the geo-utils-cpp port is present and
+      # current. fetch+reset (rather than `pull --ff-only`) is robust against
+      # the runner image leaving HEAD detached or off master — the runner is
+      # disposable, so a hard reset is safe.
+      - name: Sync vcpkg registry
+        run: |
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin master
+          git -C "$VCPKG_INSTALLATION_ROOT" reset --hard FETCH_HEAD
+
+      - name: Install geo-utils-cpp via vcpkg
+        run: "$VCPKG_INSTALLATION_ROOT/vcpkg" install geo-utils-cpp
+
+      - name: Configure consumer with vcpkg toolchain
+        run: |
+          cmake -S tests/consumer -B build-consumer \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build consumer
+        run: cmake --build build-consumer --config Release
+
+      - name: Test consumer
+        run: ctest --test-dir build-consumer -C Release --output-on-failure

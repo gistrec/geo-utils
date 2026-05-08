@@ -4,6 +4,9 @@
     <a href="https://github.com/gistrec/geo-utils-cpp/actions/workflows/ci.yml">
         <img src="https://github.com/gistrec/geo-utils-cpp/actions/workflows/ci.yml/badge.svg" alt="CI">
     </a>
+    <a href="https://github.com/gistrec/geo-utils-cpp/actions/workflows/vcpkg.yml">
+        <img src="https://github.com/gistrec/geo-utils-cpp/actions/workflows/vcpkg.yml/badge.svg" alt="vcpkg">
+    </a>
     <a href="https://app.codacy.com/gh/gistrec/geo-utils-cpp/dashboard">
       <img src="https://img.shields.io/codacy/grade/bcff544711544d5fb7da95b68abf566d" alt="Code quality">
     </a>
@@ -70,6 +73,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(GeoUtilsCpp)
 
+target_link_libraries(your_target PRIVATE geo::utils)
+```
+
+### vcpkg
+
+```sh
+vcpkg install geo-utils-cpp
+```
+
+Then in your `CMakeLists.txt`:
+
+```cmake
+find_package(GeoUtilsCpp 1.0.1 REQUIRED)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 

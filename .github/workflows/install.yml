@@ -58,18 +58,25 @@ jobs:
       # (the resolved includedir must actually contain our headers, not point at
       # a configure-time prefix that no longer matches the install location).
       # Skipped on Windows — pkg-config isn't part of the default toolchain.
+      #
+      # Expected version is derived from CMakeLists.txt rather than hardcoded
+      # so that a `project(... VERSION x.y.z ...)` bump doesn't silently leave
+      # this assertion testing the old number.
       - name: Verify pkg-config metadata
         if: runner.os != 'Windows'
         env:
           PKG_CONFIG_PATH: ${{ runner.temp }}/prefix/lib/pkgconfig
         run: |
+          expected_version=$(sed -nE 's/^project\(GeoUtilsCpp VERSION ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' CMakeLists.txt)
+          test -n "$expected_version" || { echo "ERROR: could not parse project version from CMakeLists.txt" >&2; exit 1; }
           version=$(pkg-config --modversion geo-utils-cpp)
           cflags=$(pkg-config --cflags geo-utils-cpp)
           include_dir=$(pkg-config --variable=includedir geo-utils-cpp)
+          echo "expected:   $expected_version"
           echo "version:    $version"
           echo "cflags:     $cflags"
           echo "includedir: $include_dir"
-          test "$version" = "1.0.1"
+          test "$version" = "$expected_version"
           case "$cflags" in
             *//*) echo "ERROR: doubled-slash in include path: $cflags" >&2; exit 1 ;;
           esac

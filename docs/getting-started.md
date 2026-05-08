@@ -22,6 +22,33 @@ FetchContent_MakeAvailable(GeoUtilsCpp)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
+### vcpkg
+
+The library is available in the official [vcpkg registry](https://github.com/microsoft/vcpkg).
+
+Classic mode:
+
+```sh
+vcpkg install geo-utils-cpp
+```
+
+Manifest mode — add to your `vcpkg.json`:
+
+```json
+{
+  "dependencies": [
+    "geo-utils-cpp"
+  ]
+}
+```
+
+Then consume it from CMake:
+
+```cmake
+find_package(GeoUtilsCpp 1.0.1 REQUIRED)
+target_link_libraries(your_target PRIVATE geo::utils)
+```
+
 ### find_package
 
 Install the library first, then:
