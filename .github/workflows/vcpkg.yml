@@ -67,7 +67,8 @@ jobs:
           git -C "$VCPKG_INSTALLATION_ROOT" reset --hard FETCH_HEAD
 
       - name: Install geo-utils-cpp via vcpkg
-        run: "$VCPKG_INSTALLATION_ROOT/vcpkg" install geo-utils-cpp
+        run: |
+          "$VCPKG_INSTALLATION_ROOT/vcpkg" install geo-utils-cpp
 
       - name: Configure consumer with vcpkg toolchain
         run: |
