@@ -56,10 +56,15 @@ jobs:
       - uses: actions/checkout@v4
 
       # GH-hosted runners ship vcpkg pre-installed at $VCPKG_INSTALLATION_ROOT.
-      # The bundled checkout can lag the registry by days/weeks, so pull master
-      # to make sure the geo-utils-cpp port is present and current.
-      - name: Update vcpkg registry
-        run: git -C "$VCPKG_INSTALLATION_ROOT" pull --ff-only
+      # The bundled checkout can lag the registry by days/weeks, so sync to
+      # origin/master to make sure the geo-utils-cpp port is present and
+      # current. fetch+reset (rather than `pull --ff-only`) is robust against
+      # the runner image leaving HEAD detached or off master — the runner is
+      # disposable, so a hard reset is safe.
+      - name: Sync vcpkg registry
+        run: |
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin master
+          git -C "$VCPKG_INSTALLATION_ROOT" reset --hard FETCH_HEAD
 
       - name: Install geo-utils-cpp via vcpkg
         run: "$VCPKG_INSTALLATION_ROOT/vcpkg" install geo-utils-cpp

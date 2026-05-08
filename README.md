@@ -85,7 +85,7 @@ vcpkg install geo-utils-cpp
 Then in your `CMakeLists.txt`:
 
 ```cmake
-find_package(GeoUtilsCpp CONFIG REQUIRED)
+find_package(GeoUtilsCpp 1.0.1 REQUIRED)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
