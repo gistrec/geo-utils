@@ -25,12 +25,15 @@ inline constexpr double kEarthRadius = 6371009.0;
 // not portable to MSVC without _USE_MATH_DEFINES) or std::numbers::pi (C++20).
 inline constexpr double kPi = 3.14159265358979323846;
 
+inline constexpr double kDegToRad = kPi / 180.0;
+inline constexpr double kRadToDeg = 180.0 / kPi;
+
 [[nodiscard]] inline double deg2rad(double degrees) noexcept {
-    return degrees * kPi / 180.0;
+    return degrees * kDegToRad;
 }
 
 [[nodiscard]] inline double rad2deg(double angle) noexcept {
-    return angle * 180.0 / kPi;
+    return angle * kRadToDeg;
 }
 
 // Returns the non-negative remainder of x / m.
@@ -62,7 +65,7 @@ inline constexpr double kPi = 3.14159265358979323846;
 
 // Inverse haversine. arc_hav(x) == 2 * asin(sqrt(x)). Argument must be in [0, 1].
 [[nodiscard]] inline double arc_hav(double x) noexcept {
-    return 2.0 * std::asin(std::sqrt(std::clamp(x, 0.0, 1.0)));
+    return 2.0 * std::asin(std::min(1.0, std::sqrt(std::max(0.0, x))));
 }
 
 // Given h == hav(x), returns sin(abs(x)).
