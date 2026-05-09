@@ -29,13 +29,15 @@ namespace geo {
  */
 [[nodiscard]] inline double heading(const LatLng& from, const LatLng& to) noexcept {
     double from_lat = detail::deg2rad(from.lat);
-    double from_lng = detail::deg2rad(from.lng);
     double to_lat = detail::deg2rad(to.lat);
-    double to_lng = detail::deg2rad(to.lng);
-    double d_lng = to_lng - from_lng;
+    double d_lng = detail::deg2rad(to.lng - from.lng);
+    double cos_to_lat = std::cos(to_lat);
+    double sin_to_lat = std::sin(to_lat);
+    double cos_from_lat = std::cos(from_lat);
+    double sin_from_lat = std::sin(from_lat);
     double h = std::atan2(
-        std::sin(d_lng) * std::cos(to_lat),
-        std::cos(from_lat) * std::sin(to_lat) - std::sin(from_lat) * std::cos(to_lat) * std::cos(d_lng));
+        std::sin(d_lng) * cos_to_lat,
+        cos_from_lat * sin_to_lat - sin_from_lat * cos_to_lat * std::cos(d_lng));
 
     return detail::wrap(detail::rad2deg(h), -180.0, 180.0);
 }
