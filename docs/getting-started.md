@@ -49,6 +49,33 @@ find_package(GeoUtilsCpp 1.0.1 REQUIRED)
 target_link_libraries(your_target PRIVATE geo::utils)
 ```
 
+### xrepo
+
+The library is available in the official
+[xmake-repo](https://github.com/xmake-io/xmake-repo) registry as
+`geo-utils-cpp`.
+
+Install via the `xrepo` CLI:
+
+```sh
+xrepo install geo-utils-cpp
+```
+
+Or declare it as a dependency in your `xmake.lua`:
+
+```lua
+add_requires("geo-utils-cpp")
+
+target("your_target")
+    set_kind("binary")
+    add_files("main.cpp")
+    add_packages("geo-utils-cpp")
+```
+
+A minimal smoke-test consumer (`tests/consumer/`) is included for both CMake
+and xmake builds — see [`tests/consumer/xmake.lua`](../tests/consumer/xmake.lua)
+for the xmake variant.
+
 ### find_package
 
 Install the library first, then:

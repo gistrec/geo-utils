@@ -1,0 +1,71 @@
+# xrepo integration smoke test.
+#
+# Installs geo-utils-cpp from the official xmake-io/xmake-repo registry, then
+# builds and runs the minimal consumer project (tests/consumer/main.cpp) via
+# its xmake.lua. Runs on Linux/macOS/Windows in parallel.
+#
+# What this catches:
+#   - Breakage in the published xrepo package recipe
+#   - Drift in xmake-repo or GitHub runner images
+#   - Our public header layout not surviving an install via xrepo
+#
+# Triggers: weekly cron + manual dispatch only. This workflow tests the
+# *released* version (currently 1.0.1) from xmake-repo, not HEAD, so running
+# it on every PR/push would produce a misleading green check (it cannot fail
+# on a PR that breaks HEAD). Cron catches registry / runner drift over time;
+# use workflow_dispatch when bumping the package version. If the workflow
+# itself or tests/consumer/ changes, run it manually.
+
+name: xrepo
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Tuesdays 06:00 UTC. Offset from vcpkg.yml to spread runner load.
+    - cron: '0 6 * * 2'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  xrepo-consumer:
+    name: xrepo + consumer (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      # xmake caches the package registry locally; refresh so the just-published
+      # port is visible. Matches the `vcpkg` workflow's "Sync vcpkg registry" step.
+      - name: Update xmake-repo
+        run: xmake repo --update -v
+
+      # `xmake config` resolves `add_requires("geo-utils-cpp")` against xmake-repo
+      # and installs it into the local xmake cache.
+      - name: Build consumer via xrepo
+        working-directory: tests/consumer
+        run: |
+          xmake config --yes --mode=release
+          xmake build smoke
+
+      - name: Run consumer smoke test
+        working-directory: tests/consumer
+        run: xmake run smoke
