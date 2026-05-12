@@ -9,21 +9,16 @@
 #   - Drift in vcpkg infrastructure or GitHub runner images
 #   - Our exported CMake config / target name not surviving an install via vcpkg
 #
-# What this does NOT catch:
-#   - Regressions introduced in this repo on a PR — vcpkg ships the *released*
-#     version (currently 1.0.1), not HEAD. The PR/push runs verify the
-#     published port still works; the weekly schedule catches drift over time.
-#
-# Triggered automatically on push/PR to master/main; runs weekly to catch
-# upstream drift; can also be run manually from the Actions tab.
+# Triggers: weekly cron + manual dispatch only. This workflow tests the
+# *released* version (currently 1.0.1) from the vcpkg registry, not HEAD,
+# so running it on every PR/push would produce a misleading green check
+# (it cannot fail on a PR that breaks HEAD). Cron catches registry / runner
+# drift over time; use workflow_dispatch when bumping the port version.
+# If the workflow itself or tests/consumer/ changes, run it manually.
 
 name: vcpkg
 
 on:
-  push:
-    branches: [master, main]
-  pull_request:
-    branches: [master, main]
   workflow_dispatch:
   schedule:
     # Mondays 06:00 UTC. Catches drift in the vcpkg registry / runner images.
