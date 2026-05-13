@@ -107,6 +107,34 @@ target("your_target")
     add_packages("geo-utils-cpp")
 ```
 
+### build2 / bpkg / cppget
+
+> **Package name note:** in the build2 ecosystem (cppget.org) this library
+> follows the build2 `libfoo` convention and is published as **`libgeo-utils`**.
+> Everywhere else — GitHub project, CMake, vcpkg, Conan, xrepo — it is named
+> **`geo-utils-cpp`**. Both names refer to the same library, same headers, same
+> `#include <geo/...>` API.
+
+Add the dependency to your package's `manifest`:
+
+```
+depends: libgeo-utils ^1.0.1
+```
+
+And in the consuming `buildfile`:
+
+```
+import libs = libgeo-utils%lib{geo-utils}
+
+exe{hello}: cxx{hello} $libs
+```
+
+To install it into a build2 configuration directly:
+
+```sh
+bpkg build libgeo-utils
+```
+
 ### find_package
 
 ```cmake
